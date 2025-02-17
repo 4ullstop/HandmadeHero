@@ -1,24 +1,85 @@
 #include <windows.h>
 
-LRESULT CALLBACK MainWindowProc(HWND hwnd,
-				UINT uMsg,
-				WPARAM wParam,
-				LPARAM lParam,)
+#define local_persist static
+#define global_variable static
+#define internal static
+
+global_variable bool running;
+global_variable BITMAPINFO bitmapInfo;
+global_variable void* bitmapMemory;
+global_variable HBITMAP bitmapHandle;
+global_variable HDC bitmapDeviceContext;
+
+internal void
+Win32ResizeDIBSection(int width, int height)
+{
+    if (bitmapHandle)
+    {
+	DeleteObject(bitmapHandle);
+    }
+
+    if (!bitmapDeviceContext)
+    {
+	bitmapDeviceContext = CreateCompatibleDC(0); //we want to create a compatible dc but not use the one we already have because we will be writing to the buffer before swapping the DC
+    }
+
+    bitmapInfo.bmiHeader.biSize = sizeof(bitmapInfo.bmiHeader);
+    bitmapInfo.bmiHeader.biWidth = width;
+    bitmapInfo.bmiHeader.biHeight = height;
+    bitmapInfo.bmiHeader.biPlanes = 1; //number of planes for the target device and must be set to 1
+    bitmapInfo.bmiHeader.biBitCount = 32; //num of bits per pixel
+    bitmapInfo.bmiHeader.biCompression = BI_RGB; //uncompressed RGB
+
+    bitmapHandle = CreateDIBSection(
+	bitmapDeviceContext,
+	&bitmapInfo,
+	DIB_RGB_COLORS,
+	&bitmapMemory,
+	0, //a handle to a file mapping object taht the function, null therefore it allocates mem for the DIB
+	0); //an offset fro mteh beginning of the file mapping context (if we had one)
+}
+
+internal void
+Win32UpdateWindow(HDC deviceContext, int x, int y, int width, int height)
+{
+    //copies the color data for a rect of pixels
+    StretchDIBits(deviceContext,
+		  x, y, width, height, //destination info
+		  x, y, width, height, //source info
+		  bitmapMemory,
+		  &bitmapInfo,
+		  DIB_RGB_COLORS,
+		  SRCCOPY);
+}
+
+LRESULT CALLBACK Win32MainWindowProc(HWND hwnd,
+				     UINT uMsg,
+				     WPARAM wParam,
+				     LPARAM lParam)
 {
     LRESULT result = 0;
+
     switch(uMsg)
     {
     case WM_SIZE:
     {
+	RECT clientRect;
+	GetClientRect(hwnd, &clientRect);
+	int width = clientRect.right - clientRect.left;
+	int height = clientRect.bottom - clientRect.top;
+	Win32ResizeDIBSection(width, height);
 	OutputDebugStringA("WM_SIZE\n");
+	
     } break;
     case WM_DESTROY:
     {
+	running = false;
 	OutputDebugStringA("WM_DESTROY\n");
     } break;
     case WM_CLOSE:
     {
-	OutputDebugStringA("WM_CLOSE\n");
+	running = false;
+	OutputDebugStringA("WM_CLOSE\n"):
     } break;
     case WM_ACTIVATEAPP:
     {
@@ -27,26 +88,21 @@ LRESULT CALLBACK MainWindowProc(HWND hwnd,
     case WM_PAINT:
     {
 	PAINTSTRUCT paint;
-	//Prepares the specified window for painting and fills the PAINTSTRUCT w/info abt painting
 	HDC deviceContext = BeginPaint(hwnd, &paint);
-	int HEIGHT = paint.rcPaint.bottom - paint.rcPaint.top;
-	int WIDTH = paint.rcPaint.right - paint.rcPaint.left;
-	int x = paint.rcPaint.left;
-	int y = paint.rcPaint.top;
-	static DWORD operation = WHITENESS;
-	if (operation == WHITENESS)
-	{
-	    operation = BLACKNESS;
-	}
-	else
-	{
-	    operation = WHITENESS;
-	}
-	//paint a specified rectangle using the brush that is currently selected into a specified device context
-	PatBlt(deviceContext, x, y, WIDTH, HEIGHT, operation);
+
+	int height = paint.rcPaintBottom - paint.rcPaint.top;
+	int width = paint.rcPaint.right - paint.rcPaint.left;
+	int X = paint.rcPaint.left;
+	int Y = paint.rcPaint.top;
+	Win32UpdateWindow(deviceContext, X, Y, width, height);
 	EndPaint(hwnd, &paint);
     } break;
+    default:
+    {
+
+    } break;
     }
+    return result;
 }
 
 int CALLBACK WinMain(HINSTANCE hInstance,
@@ -54,19 +110,19 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		     LPSTR lpCmdLine,
 		     int nCmdShow)
 {
-    WNDCLASS windowClass = {}; //this contains the attributes registered by the RegisterClass function
+    WNDCLASS windowClass = {};
     windowClass.style = CS_OWNDC|CS_HREDRAW|CS_VREDRAW;
     windowClass.lpfnWndProc = ;
     windowClass.hInstance = hInstance;
-    windowClass.lpszClassName = "Handmade hero window class";
+    windowClass.lpszClassName = "Handmade Hero Window Class";
 
     if (RegisterClass(&windowClass))
     {
 	HWND windowHandle = CreateWindowEx(
-	    WS_EX_CLIENTEDGE, //extended styles
-	    windowClass.lpszClassName, //must match the one used above in the windowClass struct
-	    "Handmade hero", //optional window name, more useful for windows with controls like buttons
-	    WS_OVERLAPPEDWINDOW|WS_VISIBLE, //OverlappedWindow is a default one for basic windows
+	    0,
+	    windowClass.lpszClassName,
+	    "Handmade hero",
+	    WS_OVERLAPPEDWINDOW|WS_VISIBLE,
 	    CW_USEDEFAULT,
 	    CW_USEDEFAULT,
 	    CW_USEDEFAULT,
@@ -77,14 +133,17 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    0);
 	if (windowHandle)
 	{
+	    running = true;
+
 	    MSG message;
-	    for (;;)
+	    while (running)
 	    {
 		BOOL messageResult = GetMessage(&message, 0, 0, 0);
+
 		if (messageResult > 0)
 		{
-		    TranslateMessage(&message); //reading the thread's message queue
-		    DispatchMessage(&message); //dispatches the read message to the custom window procedure
+		    TranslateMessage(&message);
+		    DispatchMessage(&message);
 		}
 		else
 		{
@@ -92,7 +151,14 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		}
 	    }
 	}
-    }
+	else
+	{
 
-    return(0);
+	}
+    }
+    else
+    {
+	
+    }
+	
 }
