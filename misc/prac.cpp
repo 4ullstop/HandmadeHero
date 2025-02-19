@@ -4,52 +4,101 @@
 #define global_variable static
 #define internal static
 
+typedef int8_t int8;
+typedef int16_t int16;
+typedef int32_t int32;
+typedef int64_t int64;
+
+typedef uint8_t uint8;
+typedef uint16_t uint16;
+typedef uint32_t uint32;
+typedef uint64_t uint64;
+
+struct win32_offscreen_buffer
+{
+    BITMAPINFO info;
+    void* memory;
+    int height;
+    int width;
+    int pitch;
+    int bytesPerPixel;
+};
+
+struct win32_window_dimension
+{
+    int width;
+    int height;
+}; 
+
 global_variable bool running;
-global_variable BITMAPINFO bitmapInfo;
-global_variable void* bitmapMemory;
-global_variable HBITMAP bitmapHandle;
-global_variable HDC bitmapDeviceContext;
+global_variable win32_offscreen_buffer globalBackBuffer;
 
 internal void
-Win32ResizeDIBSection(int width, int height)
+Win32RenderGradient(win32_offscreen_buffer buffer, int xOffset, int yOffset)
 {
-    if (bitmapHandle)
+    uint8* row = (uint8*)buffer.memory;
+    for (int y = 0; y < buffer.height; ++y)
     {
-	DeleteObject(bitmapHandle);
+	uint32* pixel = (uint32*)row;
+	for (int x = 0; x < buffer.width; ++x)
+	{
+	    uint8 blue = (x + xOffset);
+	    uint8 green = (y + yOffset);
+
+	    *pixel++ = ((green << 8) | blue);
+	}
+	row += buffer.pitch;
     }
+}
 
-    if (!bitmapDeviceContext)
-    {
-	bitmapDeviceContext = CreateCompatibleDC(0); //we want to create a compatible dc but not use the one we already have because we will be writing to the buffer before swapping the DC
-    }
+win32_window_dimension Win32GetWindowDimension(HWND window)
+{
+    win32_window_dimension result;
+    RECT clientRect;
+    GetClientRect(window, &clientRect);
+    result.width = clientRect.right - clientRect.left;
+    result.height = clientRect.bottom - clientRect.top;
 
-    bitmapInfo.bmiHeader.biSize = sizeof(bitmapInfo.bmiHeader);
-    bitmapInfo.bmiHeader.biWidth = width;
-    bitmapInfo.bmiHeader.biHeight = height;
-    bitmapInfo.bmiHeader.biPlanes = 1; //number of planes for the target device and must be set to 1
-    bitmapInfo.bmiHeader.biBitCount = 32; //num of bits per pixel
-    bitmapInfo.bmiHeader.biCompression = BI_RGB; //uncompressed RGB
-
-    bitmapHandle = CreateDIBSection(
-	bitmapDeviceContext,
-	&bitmapInfo,
-	DIB_RGB_COLORS,
-	&bitmapMemory,
-	0, //a handle to a file mapping object taht the function, null therefore it allocates mem for the DIB
-	0); //an offset fro mteh beginning of the file mapping context (if we had one)
+    return(result);
 }
 
 internal void
-Win32UpdateWindow(HDC deviceContext, int x, int y, int width, int height)
+Win32DisplayWindowBuffer(win32_offscreen_buffer buffer, HDC deviceContext,
+			  int x, int y,
+			  int windowWidth,
+			  int windowHeight)
 {
-    //copies the color data for a rect of pixels
     StretchDIBits(deviceContext,
-		  x, y, width, height, //destination info
-		  x, y, width, height, //source info
-		  bitmapMemory,
-		  &bitmapInfo,
+		  0, 0, windowWidth, windowHeight,
+		  0, 0, buffer.width, buffer.height,
+		  buffer.memory,
+		  &buffer.info,
 		  DIB_RGB_COLORS,
 		  SRCCOPY);
+}
+
+internal void
+Win32ResizeDIBSection(win32_offscreen_buffer* buffer, int width, int height)
+{
+    if (buffer->memory)
+    {
+	VirutalFree(buffer->memory, 0, MEM_RELEASE);
+    }
+
+    buffer->width = width;
+    buffer->height = height;
+
+    buffer->info.bmiHeader.biSize = sizeof(buffer->info.bmiHeader);
+    buffer->info.bmiHeader.biWidth = buffer->width;
+    buffer->info.bmiHeader.biHeight = -buffer->height;
+    buffer->info.bmiHeader.biPlanes = 1;
+    buffer->info.bmiHeader.biBitCount = 32;
+    buffer->info.bmiHeader.biComperssion = BI_RGB;
+    buffer->bytesPerPixel = 4; //rr gg bb xx
+
+    int bitmapMemorySize = (buffer->width * buffer->height) * buffer->bytesPerPixel;
+    buffer->memory = VirtualAlloc(0, bitmapMemorySize, MEM_COMMIT, PAGE_READWRITE);
+    buffer->pitch = width * buffer->bytesPerPixel;
 }
 
 LRESULT CALLBACK Win32MainWindowProc(HWND hwnd,
@@ -58,18 +107,11 @@ LRESULT CALLBACK Win32MainWindowProc(HWND hwnd,
 				     LPARAM lParam)
 {
     LRESULT result = 0;
-
     switch(uMsg)
     {
     case WM_SIZE:
     {
-	RECT clientRect;
-	GetClientRect(hwnd, &clientRect);
-	int width = clientRect.right - clientRect.left;
-	int height = clientRect.bottom - clientRect.top;
-	Win32ResizeDIBSection(width, height);
 	OutputDebugStringA("WM_SIZE\n");
-	
     } break;
     case WM_DESTROY:
     {
@@ -79,22 +121,29 @@ LRESULT CALLBACK Win32MainWindowProc(HWND hwnd,
     case WM_CLOSE:
     {
 	running = false;
-	OutputDebugStringA("WM_CLOSE\n"):
+	OutputDebugStringA("WM_CLOSE\n");
     } break;
     case WM_ACTIVATEAPP:
     {
-	OutputDebugStringA("WM_ACTIVATEAPP\n");
+	OutputDebugStringA("WM_ACTIVATEAPP\n");s
     } break;
     case WM_PAINT:
     {
+	//whenever we resize a window, the window needs to be repainted,
+	//we do our dirty calculations then tell windows that we have updated
+	// the dirtiness
 	PAINTSTRUCT paint;
 	HDC deviceContext = BeginPaint(hwnd, &paint);
 
-	int height = paint.rcPaintBottom - paint.rcPaint.top;
+	int height = paint.rcPaint.bottom - paint.rcPaint.top;
 	int width = paint.rcPaint.right - paint.rcPaint.left;
-	int X = paint.rcPaint.left;
-	int Y = paint.rcPaint.top;
-	Win32UpdateWindow(deviceContext, X, Y, width, height);
+	int x = paint.rcPaint.left;
+	int y = paint.rcPaint.top;
+
+	//TODO
+	win32_window_dimension dimension = Win32GetWindowDimension(hwnd);
+	
+	Win32DisplayWindowBuffer(globalBackBuffer, deviceContext, x, y, dimension.width, dimension.height);
 	EndPaint(hwnd, &paint);
     } break;
     default:
@@ -110,9 +159,11 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		     LPSTR lpCmdLine,
 		     int nCmdShow)
 {
+    Win32ResizeDIBSection(&globalBackBuffer, 1280, 720);
+    
     WNDCLASS windowClass = {};
-    windowClass.style = CS_OWNDC|CS_HREDRAW|CS_VREDRAW;
-    windowClass.lpfnWndProc = ;
+    windowClass.style = CS_HREDRAW|CS_VREDRAW;
+    windowClass.lpfnWndProc = Win32MainWindowProc;
     windowClass.hInstance = hInstance;
     windowClass.lpszClassName = "Handmade Hero Window Class";
 
@@ -121,7 +172,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	HWND windowHandle = CreateWindowEx(
 	    0,
 	    windowClass.lpszClassName,
-	    "Handmade hero",
+	    "Handmade Hero",
 	    WS_OVERLAPPEDWINDOW|WS_VISIBLE,
 	    CW_USEDEFAULT,
 	    CW_USEDEFAULT,
@@ -131,24 +182,31 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    0,
 	    hInstance,
 	    0);
+
 	if (windowHandle)
 	{
 	    running = true;
 
-	    MSG message;
+	    int xOffset = 0;
+	    int yOffset = 0;
 	    while (running)
 	    {
-		BOOL messageResult = GetMessage(&message, 0, 0, 0);
-
-		if (messageResult > 0)
+		MSG message;
+		while (PeekMessage(&message, 0, 0, 0, PM_REMOVE))
 		{
+		    if (message.message == WM_QUIT) running = false;
 		    TranslateMessage(&message);
 		    DispatchMessage(&message);
 		}
-		else
-		{
-		    break;
-		}
+
+		Win32RenderGradient(globalBackBuffer, xOffset, yOffset);
+
+		HDC deviceContext = GetDC(windowHandle);
+
+		win32_window_dimension dimension = Win32GetWindowDimension(windowHandle);
+		ReleaseDC(windowHandle, deviceContext);
+
+		++xOffset;
 	    }
 	}
 	else
@@ -158,7 +216,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
     }
     else
     {
-	
+
     }
-	
+
+    return(0);
 }
