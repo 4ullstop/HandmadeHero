@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <stdint.h>
 #include <xinput.h>
+#include <dsound.h>
 
 #define local_persist static  //locally created variable - exist after creation
 #define global_variable static  //defined for all gobal variables
@@ -10,6 +11,8 @@ typedef int8_t int8;
 typedef int16_t int16;
 typedef int32_t int32;
 typedef int64_t int64;
+
+typedef int32 bool32;
 
 typedef uint8_t uint8;
 typedef uint16_t uint16;
@@ -42,7 +45,7 @@ global_variable win32_offscreen_buffer globalBackBuffer;
 typedef X_INPUT_GET_STATE(x_input_get_state);
 X_INPUT_GET_STATE(XInputGetStateStub)
 {
-    return(0);
+    return(ERROR_DEVICE_NOT_CONNECTED);
 }
 global_variable x_input_get_state* XInputGetState_ = XInputGetStateStub;
 #define XInputGetState XInputGetState_
@@ -51,20 +54,110 @@ global_variable x_input_get_state* XInputGetState_ = XInputGetStateStub;
 typedef X_INPUT_SET_STATE(x_input_set_state);
 X_INPUT_SET_STATE(XInputSetStateStub)
 {
-    return(0);
+    return(ERROR_DEVICE_NOT_CONNECTED);
 }
 global_variable x_input_set_state* XInputSetState_ = XInputSetStateStub;
 #define XInputSetState XInputSetState_
+
+#define DIRECT_SOUND_CREATE(name) HRESULT WINAPI name(LPCGUID pcGuidDevice, LPDIRECTSOUND *ppDS, LPUNKNOWN pUnkOuter)
+typedef DIRECT_SOUND_CREATE(direct_sound_create);
+
+
+internal void
+Win32InitDSound(HWND window, int32 samplesPerSecond, int32 bufferSize)
+{
+    //load the library
+    //get direct sound object
+    //Create a primary buffer
+    //Create a secondary buffer (the thing we actually write to)
+    //Start it playing
+
+    HMODULE dSoundLibrary = LoadLibrary("dsound.dll");
+    if (dSoundLibrary)
+    {
+	direct_sound_create* directSoundCreate = (direct_sound_create*)GetProcAddress(dSoundLibrary, "DirectSoundCreate");
+
+	LPDIRECTSOUND directSound;
+	if (directSoundCreate && SUCCEEDED(directSoundCreate(0, &directSound, 0)))
+	{
+	    WAVEFORMATEX waveFormat = {};
+	    waveFormat.wFormatTag = WAVE_FORMAT_PCM;
+	    waveFormat.nChannels = 2;
+	    waveFormat.nSamplesPerSec = samplesPerSecond;
+	    waveFormat.wBitsPerSample = 16;
+	    waveFormat.nBlockAlign = (waveFormat.nChannels * waveFormat.wBitsPerSample) / 8;
+	    waveFormat.nAvgBytesPerSec = waveFormat.nSamplesPerSec * waveFormat.nBlockAlign;
+	    waveFormat.cbSize = 0;
+	    
+	    if(SUCCEEDED(directSound->SetCooperativeLevel(window, DSSCL_PRIORITY)))
+	    {
+		DSBUFFERDESC bufferDescription = {};
+		bufferDescription.dwSize = sizeof(bufferDescription);
+		bufferDescription.dwFlags = DSBCAPS_PRIMARYBUFFER;
+
+		
+		LPDIRECTSOUNDBUFFER primaryBuffer;
+		if(SUCCEEDED(directSound->CreateSoundBuffer(&bufferDescription, &primaryBuffer, 0)))
+		{
+		    if (SUCCEEDED(primaryBuffer->SetFormat(&waveFormat)))
+		    {
+			OutputDebugStringA("Primary buffer format was set\n");
+		    }
+		    else
+		    {
+
+		    }
+		}
+		else
+		{
+		    
+		}
+	    }
+	    else
+	    {
+		
+	    }
+
+	    DSBUFFERDESC bufferDescription = {};
+	    bufferDescription.dwSize = sizeof(bufferDescription);
+	    bufferDescription.dwFlags = 0;
+	    bufferDescription.dwBufferBytes = bufferSize;
+	    bufferDescription.lpwfxFormat = &waveFormat;
+	    LPDIRECTSOUNDBUFFER secondaryBuffer;
+	    if (SUCCEEDED(directSound->CreateSoundBuffer(&bufferDescription, &secondaryBuffer, 0)))
+	    {
+		OutputDebugStringA("Secondary buffer format was set\n");
+	    }
+	}
+	else
+	{
+	    
+	}
+    }
+    else
+    {
+	
+    }
+	
+}
 
 internal void
 Win32LoadXInput(void)
 {
     //Load the dll we actually want for XInput
-    HMODULE XInputLibrary = LoadLibrary("xinput1_3.dll");
+    HMODULE XInputLibrary = LoadLibrary("xinput1_4.dll");
+    if (!XInputLibrary)
+    {
+	XInputLibrary = LoadLibrary("xinput1_3.dll");
+    }
     if (XInputLibrary)
     {
 	XInputGetState = (x_input_get_state*)GetProcAddress(XInputLibrary, "XInputGetState");
 	XInputSetState = (x_input_set_state*)GetProcAddress(XInputLibrary, "XInputSetState");
+    }
+    else
+    {
+
     }
 }
 
@@ -229,6 +322,11 @@ LRESULT CALLBACK Win32MainWindowProc(HWND hwnd,
 		
 	    }
 	}
+	bool32 altKeyWasDown = ((lParam & (1 << 29)) != 0); //is this bit down?
+	if ((VKCode == VK_F4) && altKeyWasDown)
+	{
+	    running = false;
+	}
 
     } break;
     case WM_PAINT:
@@ -237,8 +335,6 @@ LRESULT CALLBACK Win32MainWindowProc(HWND hwnd,
 	HDC deviceContext = BeginPaint(hwnd, &paint);
 
 	//To get the window size we actually have to do the calculations ourselves
-	int HEIGHT = paint.rcPaint.bottom  - paint.rcPaint.top;
-	int WIDTH = paint.rcPaint.right - paint.rcPaint.left;
 	int X = paint.rcPaint.left;
 	int Y = paint.rcPaint.top;
 
@@ -296,6 +392,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    int xOffset = 0;
 	    int yOffset = 0;
 
+	    Win32InitDSound(windowHandle, 48000, 48000*sizeof(int16)*2);
+	    
 	    while(running)
 	    {
 
@@ -311,7 +409,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		for (DWORD controllerIndex = 0; controllerIndex < XUSER_MAX_COUNT; ++controllerIndex)
 		{
 		    XINPUT_STATE controllerState;
- 
+   
 		    if (XInputGetState(controllerIndex, &controllerState) == ERROR_SUCCESS)
 		    {
 			//the controller is plugged in
