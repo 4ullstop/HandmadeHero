@@ -154,6 +154,10 @@ Win32LoadXInput(void)
     HMODULE XInputLibrary = LoadLibrary("xinput1_4.dll");
     if (!XInputLibrary)
     {
+	XInputLibrary = LoadLibraryA("xinput9_1_0.dll");
+    }
+    if (!XInputLibrary)
+    {
 	XInputLibrary = LoadLibrary("xinput1_3.dll");
     }
     if (XInputLibrary)
@@ -367,6 +371,8 @@ struct win32_sound_output
     int bytesPerSample;
     int wavePeriod;
     int secondaryBufferSize;
+    real32 tSine;
+    int latencySampleCount;
 };
 
 internal void
@@ -392,22 +398,24 @@ Win32FillSoundBuffer(win32_sound_output* soundOutput, DWORD byteToLock, DWORD by
 	DWORD region2SampleCount = region2Size / soundOutput->bytesPerSample;
 	for (DWORD sampleIndex = 0; sampleIndex < region1SampleCount; ++sampleIndex)
 	{
-	    real32 t = 2.0f*Pi32*(real32)soundOutput->runningSampleIndex / (real32)soundOutput->wavePeriod;
-	    real32 sineValue = sinf(t);
+	    real32 sineValue = sinf(soundOutput->tSine);
 	    int16 sampleValue = (int16)(sineValue * soundOutput->toneVolume);
 	    *sampleOut++ = sampleValue;
 	    *sampleOut++ = sampleValue;
+
+	    soundOutput->tSine += 2.0f*Pi32*1.0f/(real32)soundOutput->wavePeriod;
 	    ++soundOutput->runningSampleIndex;
 	}
 	
 	sampleOut = (int16*)region2;
 	for (DWORD sampleIndex = 0; sampleIndex < region2SampleCount; ++sampleIndex)
 	{
-	    real32 t = 2.0f*Pi32*(real32)soundOutput->runningSampleIndex / (real32)soundOutput->wavePeriod;
-	    real32 sineValue = sinf(t);
+	    real32 sineValue = sinf(soundOutput->tSine);
 	    int16 sampleValue = (int16)(sineValue * soundOutput->toneVolume);
 	    *sampleOut++ = sampleValue;
 	    *sampleOut++ = sampleValue;
+
+	    soundOutput->tSine += 2.0f*Pi32*1.0f/(real32)soundOutput->wavePeriod;
 	    ++soundOutput->runningSampleIndex;
 	}
 	
@@ -422,6 +430,11 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		     LPSTR lpCmdLine,
 		     int nCmdShow)
 {
+    LARGE_INTEGER perfCountFrequencyResult;
+    QueryPerformanceFrequency(&perfCountFrequencyResult);
+    int64 perfCountFrequency = perfCountFrequencyResult.QuadPart;
+    
+    
     Win32LoadXInput();
     Win32ResizeDIBSection(&globalBackBuffer, 1280, 720);
 			  
@@ -432,6 +445,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 //    windowClass.hIcon;
     windowClass.lpszClassName = "Handmade Hero Window Class";
 
+
+    
     //Registering the window class
     if (RegisterClass(&windowClass))
     {
@@ -457,12 +472,12 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    soundOutput.samplesPerSecond = 48000;
 	    soundOutput.toneHz = 256;
 	    soundOutput.toneVolume = 3000;
-	    soundOutput.runningSampleIndex = 0;
 	    soundOutput.bytesPerSample = sizeof(int16)*2;
 	    soundOutput.wavePeriod = soundOutput.samplesPerSecond/soundOutput.toneHz;
 	    soundOutput.secondaryBufferSize = soundOutput.samplesPerSecond*soundOutput.bytesPerSample;
+	    soundOutput.latencySampleCount = soundOutput.samplesPerSecond / 15;
 	    Win32InitDSound(windowHandle, soundOutput.samplesPerSecond, soundOutput.secondaryBufferSize);
-	    Win32FillSoundBuffer(&soundOutput, 0, soundOutput.secondaryBufferSize);
+	    Win32FillSoundBuffer(&soundOutput, 0, soundOutput.latencySampleCount * soundOutput.bytesPerSample);
 
 	    secondaryBuffer->Play(0, 0, DSBPLAY_LOOPING);
 
@@ -478,17 +493,18 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    bool32 soundIsPlaying = false;
 	    
 
+	    LARGE_INTEGER lastCounter;
+	    QueryPerformanceCounter(&lastCounter);
 
-
+	    int64 lastCycleCount = __rdtsc();
 	    while(running)
 	    {
-
-
+		
 		MSG message;
 		while(PeekMessage(&message, 0, 0, 0, PM_REMOVE))
 		{
 
-		    TranslateMessage(&message);
+     		    TranslateMessage(&message);
 		    DispatchMessage(&message);
 		}
 
@@ -518,6 +534,18 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 			int16 stickX = pad->sThumbLX;
 			int16 stickY = pad->sThumbLY;
 
+			xOffset += stickX / 4096;
+			yOffset += stickY / 4096;
+
+			
+			real32 normalizedX = (real32)stickX / 30000.f;
+			real32 normalizedY = (real32)stickY / 30000.f;
+			if (aButton)
+			{
+			    soundOutput.toneHz = 512 + (int)(256.0f*(normalizedX + normalizedY));
+			    soundOutput.wavePeriod = soundOutput.samplesPerSecond / soundOutput.toneHz;
+			}
+
 			if (aButton)
 			{
 			    yOffset += 2;
@@ -540,18 +568,16 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		{
 		    DWORD byteToLock = (soundOutput.runningSampleIndex*soundOutput.bytesPerSample) % soundOutput.secondaryBufferSize;
 		    DWORD bytesToWrite;
-		    if (byteToLock == playCursor)
-		    {
-			bytesToWrite = 0;
-		    }
-		    else if (byteToLock > playCursor)
+
+		    DWORD targetCursor = ((playCursor + (soundOutput.latencySampleCount * soundOutput.bytesPerSample)) % soundOutput.secondaryBufferSize);
+		    if (byteToLock > targetCursor)
 		    {
 			bytesToWrite = (soundOutput.secondaryBufferSize - byteToLock);
-			bytesToWrite += playCursor;
+			bytesToWrite += targetCursor;
 		    }
 		    else
-		    {
-			bytesToWrite = playCursor - byteToLock;
+		    { 
+			bytesToWrite = targetCursor - byteToLock;
 		    }
 
 		    Win32FillSoundBuffer(&soundOutput, byteToLock, bytesToWrite);
@@ -567,6 +593,27 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		win32_window_dimension dimension = Win32GetWindowDimension(windowHandle);
 		Win32DisplayBufferWindow(&globalBackBuffer, deviceContext, 0, 0, dimension.width, dimension.height);
 
+		int64 endCycleCount = __rdtsc();
+		
+		LARGE_INTEGER endCounter;
+		QueryPerformanceCounter(&endCounter);
+
+
+		int64 cyclesElapsed = endCycleCount - lastCycleCount;
+		
+		//print out here
+		int64 counterElapsed = endCounter.QuadPart - lastCounter.QuadPart;
+		//Milliseconds per frame
+		int32 msPerFrame = (int32)((1000*counterElapsed) / perfCountFrequency);
+		int32 FPS = perfCountFrequency / counterElapsed;
+		int32 MCPF =  (int32)(cyclesElapsed / (1000 * 1000));
+		
+		char buffer[250];
+		wsprintf(buffer, "%dms/f, %df/s, %dmc/f\n", msPerFrame, FPS, MCPF);
+		OutputDebugStringA(buffer);  
+		
+		lastCounter = endCounter;
+		lastCycleCount = endCycleCount;
 		
 		++xOffset;
 	    }
