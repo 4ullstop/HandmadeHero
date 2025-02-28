@@ -1,3 +1,24 @@
+/*
+  This is not a final platform layer
+
+  - Saved game locations
+  - Getting a handle to our own executable file
+  - Asset loading path
+  - Threading (how to launch a thread)
+  - Raw input (support for multiple keyboards)
+  - Sleep/timeBeginPeriod
+  - ClipCursor() for multimonitor support
+  - fullscreen support
+  - WM_SETCURSOR (control cursor visibility)
+  - QueryCancelAutoplay
+  - WM_ACTIVATEAPP (for when we are not the active application)
+  - Blit speed improvements (BitBlit)
+  - Hardware acceleration (OpenGL or Direct3D)
+  - GetKeyboardLayout (for french keyboards, international WASD support)
+
+  Just a partial list of stuff
+*/
+
 #include <windows.h>
 #include <stdint.h>
 #include <xinput.h>
@@ -24,6 +45,8 @@ typedef uint64_t uint64;
 
 typedef float real32;
 typedef double real64;
+
+#include "handmade.cpp"
 
 struct win32_offscreen_buffer
 {
@@ -183,25 +206,6 @@ Win32GetWindowDimension(HWND window)
     return(result);
 }
 
-internal void
-Win32RenderGradient(win32_offscreen_buffer* buffer, int xOffset, int yOffset)
-{
-    uint8* row = (uint8*)buffer->memory;
-    for (int y = 0; y < buffer->height; ++y)
-    {
-	uint32* pixel = (uint32*)row;
-	for (int x = 0; x < buffer->width; ++x)
-	{
-	    uint8 blue = (x + xOffset);
-	    uint8 green = (y + yOffset);
-	    
-	    *pixel++ = ((green << 8) | blue);
-
-	}
-	row += buffer->pitch;
-    }
-}
-
 //the allocation of our backbuffer which we will continuously write to
 internal void
 Win32ResizeDIBSection(win32_offscreen_buffer* buffer, int width, int height)
@@ -343,7 +347,7 @@ LRESULT CALLBACK Win32MainWindowProc(HWND hwnd,
     {
 	PAINTSTRUCT paint;
 	HDC deviceContext = BeginPaint(hwnd, &paint);
-
+ 
 	//To get the window size we actually have to do the calculations ourselves
 	int X = paint.rcPaint.left;
 	int Y = paint.rcPaint.top;
@@ -496,7 +500,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    LARGE_INTEGER lastCounter;
 	    QueryPerformanceCounter(&lastCounter);
 
-	    int64 lastCycleCount = __rdtsc();
+	    uint64 lastCycleCount = __rdtsc();
 	    while(running)
 	    {
 		
@@ -557,9 +561,15 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 			//the controller is not available
 		    }
 		}
-		
-		Win32RenderGradient(&globalBackBuffer, xOffset, yOffset);
 
+		game_offscreen_buffer buffer = {};
+		buffer.memory = globalBackBuffer.memory;
+		buffer.width = globalBackBuffer.width;
+		buffer.height = globalBackBuffer.height;
+		buffer.pitch = globalBackBuffer.pitch;
+		buffer.bytesPerPixel = globalBackBuffer.bytesPerPixel;
+		
+		GameUpdateAndRender(&buffer, xOffset, yOffset);
 
 		//Direct sound output test
 		DWORD playCursor;
@@ -593,29 +603,28 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		win32_window_dimension dimension = Win32GetWindowDimension(windowHandle);
 		Win32DisplayBufferWindow(&globalBackBuffer, deviceContext, 0, 0, dimension.width, dimension.height);
 
-		int64 endCycleCount = __rdtsc();
+		uint64 endCycleCount = __rdtsc();
 		
 		LARGE_INTEGER endCounter;
 		QueryPerformanceCounter(&endCounter);
 
 
-		int64 cyclesElapsed = endCycleCount - lastCycleCount;
+		uint64 cyclesElapsed = endCycleCount - lastCycleCount;
 		
-		//print out here
 		int64 counterElapsed = endCounter.QuadPart - lastCounter.QuadPart;
 		//Milliseconds per frame
 		int32 msPerFrame = (int32)((1000*counterElapsed) / perfCountFrequency);
 		int32 FPS = perfCountFrequency / counterElapsed;
 		int32 MCPF =  (int32)(cyclesElapsed / (1000 * 1000));
-		
+
+#if 0		
 		char buffer[250];
 		wsprintf(buffer, "%dms/f, %df/s, %dmc/f\n", msPerFrame, FPS, MCPF);
 		OutputDebugStringA(buffer);  
-		
+#endif		
 		lastCounter = endCounter;
 		lastCycleCount = endCycleCount;
 		
-		++xOffset;
 	    }
 	}
 	else
