@@ -38,20 +38,25 @@ RenderGradient(game_offscreen_buffer* buffer, int xOffset, int yOffset)
 }
 
 internal void
-GameUpdateAndRender(game_input* input, game_offscreen_buffer* buffer, game_sound_output_buffer* soundBuffer)
+GameUpdateAndRender(game_memory* memory, game_input* input, game_offscreen_buffer* buffer, game_sound_output_buffer* soundBuffer)
 {
-    //TODO: Allow sample offsets here for more robust platform options
-    local_persist int blueOffset = 0;
-    local_persist int greenOffset = 0;
-    local_persist int toneHz = 256;
+    Assert(sizeof(game_state) <= memory->permanentStorageSize);
+
+    game_state* gameState = (game_state*)memory->permanentStorage;
+
+    if (!memory->isInitialized)
+    {
+	gameState->toneHz = 256;
+    }
+
 
     game_controller_input* input0 = &input->controllers[0];
     if (input0->isAnalog)
     {
 	//use analog movement tuning
 
-	    blueOffset += (int)4.0f*(input0->endX);
-	    toneHz = 256 + (int)(128.0f*(input0->endY));
+	gameState->blueOffset += (int)4.0f*(input0->endX);
+	gameState->toneHz = 256 + (int)(128.0f*(input0->endY));
     }
     else
     {
@@ -60,8 +65,8 @@ GameUpdateAndRender(game_input* input, game_offscreen_buffer* buffer, game_sound
 
     if (input0->down.endedDown)
     {
-	greenOffset += 1;
+	gameState->greenOffset += 1;
     }
-    GameOutputSound(soundBuffer, toneHz);
-    RenderGradient(buffer, blueOffset, greenOffset);
+    GameOutputSound(soundBuffer, gameState->toneHz);
+    RenderGradient(buffer, gameState->blueOffset, gameState->greenOffset);
 }
