@@ -4,6 +4,19 @@
   TODO: Services that the platform layer provides to the game
 */
 
+
+#if HANDMADE_INTERNAL
+struct debug_read_file_result
+{
+    uint32 contentsSize;
+    void* contents;
+};
+internal debug_read_file_result DEBUGPlatformReadEntireFile(char* fileName);
+internal void DEBUGPlatformFreeFileMemory(void* memory);
+
+internal bool32 DEBUGPlatformWriteEntireFile(char* fileName, uint32 memorySize, void* memory);
+#endif
+
 /*
   Note: Serverices that the game provides to the platform layer
   (this may expandin the future - sound on separate thread, etc...)
@@ -33,6 +46,14 @@
 #define Terabytes(Value) (Gigabytes(Value)*1024)
 
 #define ArrayCount(Array) (sizeof(Array) / sizeof((Array)[0])) 
+
+inline uint32
+SafeTruncateUInt64(uint64 value)
+{
+    Assert(value <= 0xFFFFFFFF);
+    uint32 result = (uint32)value;
+    return(result);
+}
 
 struct game_offscreen_buffer
 {
@@ -101,6 +122,7 @@ struct game_memory
     uint64 transientStorageSize;
     void* transientStorage;
 };
+
 
 internal void GameUpdateAndRender(game_memory* memory, game_input* input, game_offscreen_buffer* buffer, game_sound_output_buffer* soundBuffer);
 
