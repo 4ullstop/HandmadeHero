@@ -27,8 +27,8 @@ RenderGradient(game_offscreen_buffer* buffer, int xOffset, int yOffset)
 	uint32* pixel = (uint32*)row;
 	for (int x = 0; x < buffer->width; ++x)
 	{
-	    uint8 blue = (x + xOffset);
-	    uint8 green = (y + yOffset);
+	    uint8 blue = (uint8)(x + xOffset);
+	    uint8 green = (uint8)(y + yOffset);
 	    
 	    *pixel++ = ((green << 8) | blue);
 
@@ -56,6 +56,7 @@ GameUpdateAndRender(game_memory* memory, game_input* input, game_offscreen_buffe
 	}
 			
 	gameState->toneHz = 256;
+	memory->isInitialized = true;
     }
 
 
@@ -64,7 +65,7 @@ GameUpdateAndRender(game_memory* memory, game_input* input, game_offscreen_buffe
     {
 	//use analog movement tuning
 
-	gameState->blueOffset += (int)4.0f*(input0->endX);
+	gameState->blueOffset += (int)(4.0f*(input0->endX));
 	gameState->toneHz = 256 + (int)(128.0f*(input0->endY));
     }
     else

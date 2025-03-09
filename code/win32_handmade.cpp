@@ -357,7 +357,7 @@ LRESULT CALLBACK Win32MainWindowProc(HWND hwnd,
     case WM_KEYDOWN:
     case WM_KEYUP:
     {
-	uint32 VKCode = wParam;
+	uint32 VKCode = (uint32)wParam;
 	bool wasDown = ((lParam & (1 << 30)) != 0);
 	bool isDown = ((lParam & (1 << 31)) == 0);
 	if (wasDown != isDown)
@@ -523,6 +523,13 @@ Win32ProcessXInputDigitalButton(DWORD xInputButtonState, game_button_state* oldS
     newState->halfTransitionCount = (newState->endedDown != oldState->endedDown) ? 1 : 0;
 }
 
+internal void
+Win32ProcessKeyboardMessage(game_button_state* newState, bool32 isDown)
+{
+    newState->endedDown = isDown;
+    ++newState->halfTransitionCount;
+}
+
 int CALLBACK WinMain(HINSTANCE hInstance,
 		     HINSTANCE hPrevInstance,
 		     LPSTR lpCmdLine,
@@ -587,10 +594,10 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    
 	    game_memory gameMemory = {};
 	    gameMemory.permanentStorageSize = Megabytes(64);
-	    gameMemory.transientStorageSize = Gigabytes((uint64)4);
+	    gameMemory.transientStorageSize = Gigabytes(1);
 	    
 	    uint64 totalSize = gameMemory.permanentStorageSize + gameMemory.transientStorageSize;
-	    gameMemory.permanentStorage = VirtualAlloc(baseAddress, totalSize, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
+	    gameMemory.permanentStorage = VirtualAlloc(baseAddress, (size_t)totalSize, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
 	    gameMemory.transientStorage = ((uint8*)gameMemory.permanentStorage + gameMemory.permanentStorageSize);
 
 	    
@@ -621,17 +628,98 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		
 		    MSG message;
 
-
-		
+		    game_controller_input* keyboardController = &newInput->controllers[0];
+		    game_controller_input zeroController = {};
+		    *keyboardController = zeroController;
+		    
 		    while(PeekMessage(&message, 0, 0, 0, PM_REMOVE))
 		    {
+			if (message.message == WM_QUIT)
+			{
+			    running = false;
+			}
 
+			switch(message.message)
+			{
+			case WM_SYSKEYDOWN:
+			case WM_SYSKEYUP:
+			case WM_KEYDOWN:
+			case WM_KEYUP:
+			{
+			    uint32 VKCode = (uint32)message.wParam;
+			    bool32 wasDown = ((message.lParam & (1 << 30)) != 0);
+			    bool32 isDown = ((message.lParam ^ (1 << 31)) == 0);
+			    if (wasDown != isDown)
+			    {
+				if (VKCode == 'W')
+				{
+
+				}
+				else if (VKCode == 'A')
+				{
+
+				}
+				else if (VKCode == 'S')
+				{
+
+				}
+				else if (VKCode == 'D')
+				{
+
+				}
+				else if (VKCode == 'Q')
+				{
+				    Win32ProcessKeyboardMessage(&keyboardController->leftShoulder,
+								isDown);
+				}
+				else if (VKCode == 'E')
+				{
+				    Win32ProcessKeyboardMessage(&keyboardController->rightShoulder,
+								isDown);
+				}
+				else if (VKCode == VK_UP)
+				{
+				    Win32ProcessKeyboardMessage(&keyboardController->up,
+								isDown);
+				}
+				else if (VKCode == VK_DOWN)
+				{
+				    Win32ProcessKeyboardMessage(&keyboardController->down,
+								isDown);
+				}
+				else if (VKCode == VK_LEFT)
+				{
+				    Win32ProcessKeyboardMessage(&keyboardController->left,
+								isDown);
+
+				}
+				else if (VKCode == VK_RIGHT)
+				{
+				    Win32ProcessKeyboardMessage(&keyboardController->right,
+								isDown);
+				}
+				else if (VKCode == VK_ESCAPE)
+				{
+				    running = false;
+				}
+				else if (VKCode == VK_SPACE)
+				{
+
+				}
+			    }
+			    bool32 altKeyWasDown = ((message.lParam & (1 << 29)) != 0);
+			    if ((VKCode == VK_F4) && altKeyWasDown)
+			    {
+				running = false;
+			    }
+			} break;
+			}
 			TranslateMessage(&message);
 			DispatchMessage(&message);
 		    }
 
 
-		    int maxControllerCount = XUSER_MAX_COUNT;
+		    DWORD maxControllerCount = XUSER_MAX_COUNT;
 		    if (maxControllerCount > ArrayCount(newInput->controllers))
 		    {
 			maxControllerCount = ArrayCount(newInput->controllers);
@@ -709,11 +797,11 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 			}
 		    }
 
-		    DWORD playCursor;
-		    DWORD writeCursor;
-		    DWORD targetCursor;
-		    DWORD bytesToWrite;
-		    DWORD byteToLock;
+		    DWORD playCursor = 0;
+		    DWORD writeCursor = 0;
+		    DWORD targetCursor = 0;
+		    DWORD bytesToWrite = 0;
+		    DWORD byteToLock = 0;
 		    bool32 soundIsValid = false;
 		    if (SUCCEEDED(secondaryBuffer->GetCurrentPosition(&playCursor, &writeCursor)))
 		    {
@@ -776,7 +864,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		    int64 counterElapsed = endCounter.QuadPart - lastCounter.QuadPart;
 		    //Milliseconds per frame
 		    int32 msPerFrame = (int32)((1000*counterElapsed) / perfCountFrequency);
-		    int32 FPS = perfCountFrequency / counterElapsed;
+		    int32 FPS = (int32)perfCountFrequency / (int32)counterElapsed;
 		    int32 MCPF =  (int32)(cyclesElapsed / (1000 * 1000));
 
 #if 0		
