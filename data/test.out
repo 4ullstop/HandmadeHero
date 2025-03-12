@@ -59,24 +59,36 @@ GameUpdateAndRender(game_memory* memory, game_input* input, game_offscreen_buffe
 	memory->isInitialized = true;
     }
 
-
-    game_controller_input* input0 = &input->controllers[0];
-    if (input0->isAnalog)
+    for (int controllerIndex = 0; controllerIndex < ArrayCount(input->controllers); ++controllerIndex)
     {
-	//use analog movement tuning
+	game_controller_input* controller = GetController(input, controllerIndex);
+	if (controller->isAnalog)
+	{
+	    //use analog movement tuning
 
-	gameState->blueOffset += (int)(4.0f*(input0->endX));
-	gameState->toneHz = 256 + (int)(128.0f*(input0->endY));
-    }
-    else
-    {
-	//use digital movement tuning
-    }
+	    gameState->blueOffset += (int)(4.0f*(controller->stickAverageX));
+	    gameState->toneHz = 256 + (int)(128.0f*(controller->stickAverageY));
+	}
+	else
+	{
+	    //use digital movement tuning
+	    if (controller->moveLeft.endedDown)
+	    {
+		gameState->blueOffset -= 1;
+	    }
+	    
+	    if (controller->moveRight.endedDown)
+	    {
+		gameState->blueOffset += 1;
+	    }
+	}
 
-    if (input0->down.endedDown)
-    {
-	gameState->greenOffset += 1;
+	if (controller->actionDown.endedDown)
+	{
+	    gameState->greenOffset += 1;
+	}
     }
+    
     GameOutputSound(soundBuffer, gameState->toneHz);
     RenderGradient(buffer, gameState->blueOffset, gameState->greenOffset);
 }

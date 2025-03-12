@@ -79,38 +79,47 @@ struct game_button_state
 
 struct game_controller_input
 {
-    bool32 isAnalog; 
-    
-    real32 startX;
-    real32 startY;
+    bool32 isAnalog;
+    bool32 isConnected;
 
-    real32 minX;
-    real32 minY;
-
-    real32 maxX;
-    real32 maxY;
+    real32 stickAverageX;
+    real32 stickAverageY;
     
-    real32 endX;
-    real32 endY;
     union
     {
+	game_button_state buttons[10];
 	struct
 	{
+	    game_button_state moveUp;
+	    game_button_state moveDown;
+	    game_button_state moveLeft;
+	    game_button_state moveRight;
 	    
-	    game_button_state up;
-	    game_button_state down;
-	    game_button_state left;
-	    game_button_state right;
+	    game_button_state actionUp;
+	    game_button_state actionDown;
+	    game_button_state actionLeft;
+	    game_button_state actionRight;
+	    
 	    game_button_state leftShoulder;
 	    game_button_state rightShoulder;
+
+	    game_button_state back;
+	    game_button_state start;
 	};
     };
 };
 
 struct game_input
 {
-    game_controller_input controllers[4];
+    game_controller_input controllers[5];
 };
+inline game_controller_input *GetController(game_input* input, int controllerIndex)
+{
+    Assert(controllerIndex < ArrayCount(input->controllers));
+    game_controller_input* result = &input->controllers[controllerIndex]; 
+    return(result);
+}
+
 
 struct game_memory
 {
@@ -140,6 +149,5 @@ struct game_state
 
 #define HANDMADE_H
 #endif
-
 
 
