@@ -40,6 +40,8 @@ RenderGradient(game_offscreen_buffer* buffer, int xOffset, int yOffset)
 internal void
 GameUpdateAndRender(game_memory* memory, game_input* input, game_offscreen_buffer* buffer, game_sound_output_buffer* soundBuffer)
 {
+    Assert((&input->controllers[0].terminator - &input->controllers[0].buttons[0]) ==
+	   (ArrayCount(input->controllers[0].buttons)));
     Assert(sizeof(game_state) <= memory->permanentStorageSize);
 
     game_state* gameState = (game_state*)memory->permanentStorage;

@@ -87,7 +87,7 @@ struct game_controller_input
     
     union
     {
-	game_button_state buttons[10];
+	game_button_state buttons[12];
 	struct
 	{
 	    game_button_state moveUp;
@@ -105,6 +105,9 @@ struct game_controller_input
 
 	    game_button_state back;
 	    game_button_state start;
+
+	    //
+	    game_button_state terminator;
 	};
     };
 };
@@ -113,7 +116,7 @@ struct game_input
 {
     game_controller_input controllers[5];
 };
-inline game_controller_input *GetController(game_input* input, int controllerIndex)
+inline game_controller_input *GetController(game_input* input, int unsigned controllerIndex)
 {
     Assert(controllerIndex < ArrayCount(input->controllers));
     game_controller_input* result = &input->controllers[controllerIndex]; 
