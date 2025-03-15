@@ -22,9 +22,15 @@ struct win32_sound_output
     int samplesPerSecond;
     uint32 runningSampleIndex;
     int bytesPerSample;
-    int secondaryBufferSize;
+    DWORD secondaryBufferSize;
     real32 tSine;
     int latencySampleCount;
+};
+
+struct win32_debug_time_marker
+{
+    DWORD playCursor;
+    DWORD writeCursor;
 };
 
 #define WIN32_HANDMADE_H
