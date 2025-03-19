@@ -1,20 +1,23 @@
 #include "handmade.h"
 
 internal void
-GameOutputSound(game_sound_output_buffer *soundBuffer, int toneHz)
+GameOutputSound(game_state* gameState, game_sound_output_buffer *soundBuffer, int toneHz)
 {
-    local_persist real32 tSine;
     int16 toneVolume = 3000;
     int16* sampleOut = soundBuffer->samples;
     int wavePeriod = soundBuffer->samplesPerSecond / toneHz;
     for (int sampleIndex = 0; sampleIndex < soundBuffer->sampleCount; ++sampleIndex)
     {
-	real32 sineValue = sinf(tSine);
+	real32 sineValue = sinf(gameState->tSine);
 	int16 sampleValue = (int16)(sineValue * toneVolume);
 	*sampleOut++ = sampleValue;
 	*sampleOut++ = sampleValue;
 	
-	tSine += 2.0f*Pi32*1.0f/(real32)wavePeriod;
+	gameState->tSine += 2.0f*Pi32*1.0f/(real32)wavePeriod;
+	if (gameState->tSine > 2.0f*Pi32)
+	{
+	    gameState->tSine -= 2.0f*Pi32;
+	}
     }
 }
 
@@ -37,8 +40,7 @@ RenderGradient(game_offscreen_buffer* buffer, int xOffset, int yOffset)
     }
 }
 
-internal void
-GameUpdateAndRender(game_memory* memory, game_input* input, game_offscreen_buffer* buffer)
+extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 {
     Assert((&input->controllers[0].terminator - &input->controllers[0].buttons[0]) ==
 	   (ArrayCount(input->controllers[0].buttons)));
@@ -50,14 +52,15 @@ GameUpdateAndRender(game_memory* memory, game_input* input, game_offscreen_buffe
     {
 	char* fileName = __FILE__;
 
-	debug_read_file_result file = DEBUGPlatformReadEntireFile(fileName);
+	debug_read_file_result file = memory->DEBUGPlatformReadEntireFile(fileName);
 	if (file.contents)
 	{
-	    DEBUGPlatformWriteEntireFile("w:/data/test.out", file.contentsSize, file.contents);
-	    DEBUGPlatformFreeFileMemory(file.contents);
+	    memory->DEBUGPlatformWriteEntireFile("w:/data/test.out", file.contentsSize, file.contents);
+	    memory->DEBUGPlatformFreeFileMemory(file.contents);
 	}
 			
 	gameState->toneHz = 256;
+	gameState->tSine = 0.0f;
 	memory->isInitialized = true;
     }
 
@@ -95,9 +98,20 @@ GameUpdateAndRender(game_memory* memory, game_input* input, game_offscreen_buffe
     RenderGradient(buffer, gameState->blueOffset, gameState->greenOffset);
 }
 
-internal void
-GameGetSoundSamples(game_memory* memory, game_sound_output_buffer* soundBuffer)
+extern "C" GAME_GET_SOUND_SAMPLES(GameGetSoundSamples)
 {
     game_state* gameState = (game_state*)memory->permanentStorage;
-    GameOutputSound(soundBuffer, gameState->toneHz);
+    GameOutputSound(gameState, soundBuffer, gameState->toneHz);
 }
+
+#if HANDMADE_WIN32
+//stick in our stub
+#include "windows.h"
+//where windows knows to go when our dll is used by another process or thread
+BOOL WINAPI DllMain(HINSTANCE hinstDLL,
+		    DWORD fdwReason,
+		    LPVOID lpvReserved)
+{
+    return(TRUE);
+}
+#endif

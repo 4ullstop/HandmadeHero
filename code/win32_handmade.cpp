@@ -18,36 +18,11 @@
 
   Just a partial list of stuff
 */
-#include <stdint.h>
-#include <stdio.h>
 
-#define local_persist static  //locally created variable - exist after creation
-#define global_variable static  //defined for all gobal variables
-#define internal static  //defines a function as being local to the file (translation unit) it's in
-
-#define Pi32 3.14159265359f
-
-typedef int8_t int8;
-typedef int16_t int16;
-typedef int32_t int32;
-typedef int64_t int64;
-
-typedef int32 bool32;
-
-typedef uint8_t uint8;
-typedef uint16_t uint16;
-typedef uint32_t uint32;
-typedef uint64_t uint64;
-
-typedef float real32;
-typedef double real64;
-
-#include <math.h>
 #include "handmade.h"
-#include "handmade.cpp"
-
 
 #include <windows.h>
+#include <stdio.h>
 #include <xinput.h>
 #include <dsound.h>
 #include <malloc.h>
@@ -83,8 +58,13 @@ global_variable x_input_set_state* XInputSetState_ = XInputSetStateStub;
 #define DIRECT_SOUND_CREATE(name) HRESULT WINAPI name(LPCGUID pcGuidDevice, LPDIRECTSOUND *ppDS, LPUNKNOWN pUnkOuter)
 typedef DIRECT_SOUND_CREATE(direct_sound_create);
 
-internal debug_read_file_result
-DEBUGPlatformReadEntireFile(char* fileName)
+
+DEBUG_PLATFORM_FREE_FILE_MEMORY(DEBUGPlatformFreeFileMemory)
+{
+    VirtualFree(memory, 0, MEM_RELEASE);
+}
+
+DEBUG_PLATFORM_READ_ENTIRE_FILE(DEBUGPlatformReadEntireFile)
 {
     debug_read_file_result result = {};
     HANDLE fileHandle = CreateFile(fileName,
@@ -137,14 +117,7 @@ DEBUGPlatformReadEntireFile(char* fileName)
     return(result);
 }
 
-internal void
-DEBUGPlatformFreeFileMemory(void* memory)
-{
-    VirtualFree(memory, 0, MEM_RELEASE);
-}
-
-internal bool32
-DEBUGPlatformWriteEntireFile(char* fileName, uint32 memorySize, void* memory)
+DEBUG_PLATFORM_WRITE_ENTIRE_FILE(DEBUGPlatformWriteEntireFile) 
 {
     bool32 result = 0;
     HANDLE fileHandle = CreateFile(fileName,
@@ -246,6 +219,54 @@ Win32InitDSound(HWND window, int32 samplesPerSecond, int32 bufferSize)
 	
     }
 	
+}
+
+struct win32_game_code
+{
+    HMODULE gameCodeDLL; //saving this so we can use it to free old stuff later
+    game_update_and_render* UpdateAndRender;
+    game_get_sound_samples* GetSoundSamples;
+
+    bool32 isValid;
+};
+
+internal win32_game_code
+Win32LoadGameCode(void)
+{
+    win32_game_code result = {};
+
+    //this doesn't really work unless we set the working directory, but I don't wanna do that rn
+    CopyFile("handmade.exe", "handmade_temp.dll", FALSE); //stops us from locking the file when we want to reload it
+    result.gameCodeDLL = LoadLibrary("handmade_temp.dll");
+    if (result.gameCodeDLL)
+    {
+	result.UpdateAndRender = (game_update_and_render*)GetProcAddress(result.gameCodeDLL, "GameUpdateAndRender");
+	result.GetSoundSamples = (game_get_sound_samples*)GetProcAddress(result.gameCodeDLL, "GameGetSoundSamples");
+
+	result.isValid = (result.UpdateAndRender && result.GetSoundSamples);
+    }
+
+    if (!result.isValid)
+    {
+	result.UpdateAndRender = GameUpdateAndRenderStub;
+	result.GetSoundSamples = GameGetSoundSamplesStub; 
+    }
+    return(result);
+}
+
+internal void
+Win32UnloadGameCode(win32_game_code* gameCode)
+{
+    if (gameCode->gameCodeDLL)
+    {
+	FreeLibrary(gameCode->gameCodeDLL);
+	gameCode->gameCodeDLL = 0;
+    }
+
+    gameCode->isValid = false;
+    gameCode->UpdateAndRender = GameUpdateAndRenderStub;
+    gameCode->GetSoundSamples = GameGetSoundSamplesStub;
+
 }
 
 internal void
@@ -761,7 +782,7 @@ Win32DebugSyncDisplay(win32_offscreen_buffer* backBuffer, int markerCount,
 	    bottom += lineHeight + padY;
 
 	    Win32DrawSoundBufferMarker(backBuffer, soundOutput, c, padX, firstTop, bottom,
-				       thisMarker->expectedFlipPlayCursor, expectedFlipColor);
+				       thisMarker->expectedFlipPlayCursor, expectedFlipColor);  
 		    
 	}
 
@@ -783,6 +804,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
     LARGE_INTEGER perfCountFrequencyResult;
     QueryPerformanceFrequency(&perfCountFrequencyResult);
     perfCountFrequency = perfCountFrequencyResult.QuadPart;
+
+
 
     //Setting the windows scheduler granularity to 1ms so that
     // our Sleep() can be more granular.
@@ -825,6 +848,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	
 	if (windowHandle)
 	{
+
 	    
 	    win32_sound_output soundOutput = {};
 	    
@@ -846,6 +870,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    running = true;
 	    while(running)
 	    {
+
 		DWORD playCursor = 0;
 		DWORD writeCursor = 0;
 		
@@ -865,6 +890,9 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    game_memory gameMemory = {};
 	    gameMemory.permanentStorageSize = Megabytes(64);
 	    gameMemory.transientStorageSize = Gigabytes(1);
+	    gameMemory.DEBUGPlatformReadEntireFile = DEBUGPlatformReadEntireFile;
+	    gameMemory.DEBUGPlatformFreeFileMemory = DEBUGPlatformFreeFileMemory;
+	    gameMemory.DEBUGPlatformWriteEntireFile = DEBUGPlatformWriteEntireFile;
 	    
 	    uint64 totalSize = gameMemory.permanentStorageSize + gameMemory.transientStorageSize;
 	    gameMemory.permanentStorage = VirtualAlloc(baseAddress, (size_t)totalSize, MEM_RESERVE|MEM_COMMIT, PAGE_READWRITE);
@@ -899,7 +927,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		real32 audioLatencySeconds = 0;
 		bool32 soundIsValid = false;
 		
-
+		win32_game_code game = Win32LoadGameCode();
+		uint32 loadCounter = 120;
 
 		/*
 		  Start of the main game loop
@@ -907,6 +936,14 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		 */
 		while(running)
 		{
+		    if (loadCounter++ > 120)
+		    {
+			Win32UnloadGameCode(&game);
+			game = Win32LoadGameCode();
+			loadCounter = 0;
+		    }
+
+
 		    game_controller_input* oldKeyboardController = GetController(oldInput, 0);
 		    game_controller_input* newKeyboardController = GetController(newInput, 0);
 		    *newKeyboardController = {};
@@ -1033,7 +1070,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 			buffer.height = globalBackBuffer.height;
 			buffer.pitch = globalBackBuffer.pitch;
 			buffer.bytesPerPixel = globalBackBuffer.bytesPerPixel;
-			GameUpdateAndRender(&gameMemory, newInput, &buffer);
+			game.UpdateAndRender(&gameMemory, newInput, &buffer);
 
 
 			DWORD playCursor;
@@ -1125,7 +1162,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 			    soundBuffer.samplesPerSecond = soundOutput.samplesPerSecond;
 			    soundBuffer.sampleCount = bytesToWrite / soundOutput.bytesPerSample;
 			    soundBuffer.samples = samples;
-			    GameGetSoundSamples(&gameMemory, &soundBuffer);
+			    game.GetSoundSamples(&gameMemory, &soundBuffer);
 			
 #if HANDMADE_INTERNAL
 
@@ -1270,6 +1307,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 			if (debugTimeMarkerIndex == ArrayCount(debugTimeMarkers)) debugTimeMarkerIndex = 0;
 #endif
 		    }
+
 		}
 	    }
 	    else
