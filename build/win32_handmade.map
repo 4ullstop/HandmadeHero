@@ -1,6 +1,6 @@
  win32_handmade
 
- Timestamp is 67d8c87c (Mon Mar 17 21:12:28 2025)
+ Timestamp is 67da0cb8 (Tue Mar 18 20:15:52 2025)
 
  Preferred load address is 0000000140000000
 
@@ -2693,9 +2693,9 @@
  0001:0007abec       wcschr                     000000014007bbec f   libvcruntime:wcschr.obj
  0001:0007ac82       RtlUnwind                  000000014007bc82 f   kernel32:KERNEL32.dll
  0001:0007b310       WinMain                    000000014007c310 f   win32_handmade.obj
- 0001:0007c640       ?XInputGetStateStub@@YAKKPEAU_XINPUT_STATE@@@Z 000000014007d640 f   win32_handmade.obj
- 0001:0007c660       ?XInputSetStateStub@@YAKKPEAU_XINPUT_STATE@@@Z 000000014007d660 f   win32_handmade.obj
- 0001:0007cbc0       ?Win32MainWindowProc@@YA_JPEAUHWND__@@I_K_J@Z 000000014007dbc0 f   win32_handmade.obj
+ 0001:0007c700       ?XInputGetStateStub@@YAKKPEAU_XINPUT_STATE@@@Z 000000014007d700 f   win32_handmade.obj
+ 0001:0007c720       ?XInputSetStateStub@@YAKKPEAU_XINPUT_STATE@@@Z 000000014007d720 f   win32_handmade.obj
+ 0001:0007cc80       ?Win32MainWindowProc@@YA_JPEAUHWND__@@I_K_J@Z 000000014007dc80 f   win32_handmade.obj
  0001:0007e1a0       _guard_dispatch_icall_nop  000000014007f1a0 f   LIBCMT:guard_dispatch.obj
  0001:0007e1c0       _guard_xfg_dispatch_icall_nop 000000014007f1c0 f   LIBCMT:guard_xfg_dispatch.obj
  0001:0007f200       memset_repstos             0000000140080200 f   libvcruntime:memset.obj
@@ -8879,19 +8879,19 @@
  0001:0007b0f0       ?GameGetSoundSamples@@YAXPEAUgame_memory@@PEAUgame_sound_output_buffer@@@Z 000000014007c0f0 f   win32_handmade.obj
  0001:0007b130       ?GameOutputSound@@YAXPEAUgame_sound_output_buffer@@H@Z 000000014007c130 f   win32_handmade.obj
  0001:0007b230       ?RenderGradient@@YAXPEAUgame_offscreen_buffer@@HH@Z 000000014007c230 f   win32_handmade.obj
- 0001:0007c680       ?Win32InitDSound@@YAXPEAUHWND__@@HH@Z 000000014007d680 f   win32_handmade.obj
- 0001:0007c8f0       ?Win32LoadXInput@@YAXXZ    000000014007d8f0 f   win32_handmade.obj
- 0001:0007c980       ?Win32GetWindowDimension@@YA?AUwin32_window_dimension@@PEAUHWND__@@@Z 000000014007d980 f   win32_handmade.obj
- 0001:0007c9f0       ?Win32ResizeDIBSection@@YAXPEAUwin32_offscreen_buffer@@HH@Z 000000014007d9f0 f   win32_handmade.obj
- 0001:0007cb10       ?Win32DisplayBufferWindow@@YAXPEAUwin32_offscreen_buffer@@PEAUHDC__@@HHHH@Z 000000014007db10 f   win32_handmade.obj
- 0001:0007ceb0       ?Win32ClearBuffer@@YAXPEAUwin32_sound_output@@@Z 000000014007deb0 f   win32_handmade.obj
- 0001:0007cfe0       ?Win32FillSoundBuffer@@YAXPEAUwin32_sound_output@@KKPEAUgame_sound_output_buffer@@@Z 000000014007dfe0 f   win32_handmade.obj
- 0001:0007d250       ?Win32ProcessXInputDigitalButton@@YAXKPEAUgame_button_state@@K0@Z 000000014007e250 f   win32_handmade.obj
- 0001:0007d2d0       ?Win32ProcessKeyboardMessage@@YAXPEAUgame_button_state@@H@Z 000000014007e2d0 f   win32_handmade.obj
- 0001:0007d320       ?Win32ProcessPendingMessages@@YAXPEAUgame_controller_input@@@Z 000000014007e320 f   win32_handmade.obj
- 0001:0007d620       ?Win32ProcessInputStickValue@@YAMFF@Z 000000014007e620 f   win32_handmade.obj
- 0001:0007d6d0       ?Win32DebugDrawVertical@@YAXPEAUwin32_offscreen_buffer@@HHHI@Z 000000014007e6d0 f   win32_handmade.obj
- 0001:0007d7b0       ?Win32DebugSyncDisplay@@YAXPEAUwin32_offscreen_buffer@@HPEAUwin32_debug_time_marker@@HPEAUwin32_sound_output@@M@Z 000000014007e7b0 f   win32_handmade.obj
+ 0001:0007c740       ?Win32InitDSound@@YAXPEAUHWND__@@HH@Z 000000014007d740 f   win32_handmade.obj
+ 0001:0007c9b0       ?Win32LoadXInput@@YAXXZ    000000014007d9b0 f   win32_handmade.obj
+ 0001:0007ca40       ?Win32GetWindowDimension@@YA?AUwin32_window_dimension@@PEAUHWND__@@@Z 000000014007da40 f   win32_handmade.obj
+ 0001:0007cab0       ?Win32ResizeDIBSection@@YAXPEAUwin32_offscreen_buffer@@HH@Z 000000014007dab0 f   win32_handmade.obj
+ 0001:0007cbd0       ?Win32DisplayBufferWindow@@YAXPEAUwin32_offscreen_buffer@@PEAUHDC__@@HHHH@Z 000000014007dbd0 f   win32_handmade.obj
+ 0001:0007cf70       ?Win32ClearBuffer@@YAXPEAUwin32_sound_output@@@Z 000000014007df70 f   win32_handmade.obj
+ 0001:0007d0a0       ?Win32FillSoundBuffer@@YAXPEAUwin32_sound_output@@KKPEAUgame_sound_output_buffer@@@Z 000000014007e0a0 f   win32_handmade.obj
+ 0001:0007d310       ?Win32ProcessXInputDigitalButton@@YAXKPEAUgame_button_state@@K0@Z 000000014007e310 f   win32_handmade.obj
+ 0001:0007d390       ?Win32ProcessKeyboardMessage@@YAXPEAUgame_button_state@@H@Z 000000014007e390 f   win32_handmade.obj
+ 0001:0007d3e0       ?Win32ProcessPendingMessages@@YAXPEAUgame_controller_input@@@Z 000000014007e3e0 f   win32_handmade.obj
+ 0001:0007d6e0       ?Win32ProcessInputStickValue@@YAMFF@Z 000000014007e6e0 f   win32_handmade.obj
+ 0001:0007d790       ?Win32DebugDrawVertical@@YAXPEAUwin32_offscreen_buffer@@HHHI@Z 000000014007e790 f   win32_handmade.obj
+ 0001:0007d870       ?Win32DebugSyncDisplay@@YAXPEAUwin32_offscreen_buffer@@HPEAUwin32_debug_time_marker@@HPEAUwin32_sound_output@@M@Z 000000014007e870 f   win32_handmade.obj
  0001:0007e190       $$000000                   000000014007f190     LIBCMT:guard_dispatch.obj
  0001:0007e1b0       $$000000                   000000014007f1b0     LIBCMT:guard_xfg_dispatch.obj
  0001:0007f200       $$000000                   0000000140080200     libvcruntime:memset.obj
@@ -9186,25 +9186,25 @@
  0002:00006d4c       ?candidate_modules@?1??try_get_AppPolicyGetWindowingModel@@YAP6AJPEAXPEAW4AppPolicyWindowingModel@@@ZXZ@4QBW4module_id@?A0x391cf84c@@B 000000014008ad4c     libucrt:winapi_thunks.obj
  0002:00006d70       ?candidate_modules@?1??try_get_SetThreadStackGuarantee@@YAP6AHPEAK@ZXZ@4QBW4module_id@?A0x391cf84c@@B 000000014008ad70     libucrt:winapi_thunks.obj
  0002:00006da0       ?candidate_modules@?1??try_get_SystemFunction036@@YAP6AEPEAXK@ZXZ@4QBW4module_id@?A0x391cf84c@@B 000000014008ada0     libucrt:winapi_thunks.obj
- 0002:000076d8       $SG88082                   000000014008b6d8     win32_handmade.obj
- 0002:000076e8       $SG88085                   000000014008b6e8     win32_handmade.obj
- 0002:00007700       $SG88094                   000000014008b700     win32_handmade.obj
- 0002:00007720       $SG88096                   000000014008b720     win32_handmade.obj
- 0002:00007748       $SG88103                   000000014008b748     win32_handmade.obj
- 0002:00007758       $SG88105                   000000014008b758     win32_handmade.obj
- 0002:00007768       $SG88107                   000000014008b768     win32_handmade.obj
- 0002:00007778       $SG88110                   000000014008b778     win32_handmade.obj
- 0002:00007788       $SG88111                   000000014008b788     win32_handmade.obj
- 0002:00007798       $SG88154                   000000014008b798     win32_handmade.obj
- 0002:000077a8       $SG88156                   000000014008b7a8     win32_handmade.obj
- 0002:000077b8       $SG88158                   000000014008b7b8     win32_handmade.obj
- 0002:000077c8       $SG88160                   000000014008b7c8     win32_handmade.obj
+ 0002:000076d8       $SG88083                   000000014008b6d8     win32_handmade.obj
+ 0002:000076e8       $SG88086                   000000014008b6e8     win32_handmade.obj
+ 0002:00007700       $SG88095                   000000014008b700     win32_handmade.obj
+ 0002:00007720       $SG88097                   000000014008b720     win32_handmade.obj
+ 0002:00007748       $SG88104                   000000014008b748     win32_handmade.obj
+ 0002:00007758       $SG88106                   000000014008b758     win32_handmade.obj
+ 0002:00007768       $SG88108                   000000014008b768     win32_handmade.obj
+ 0002:00007778       $SG88111                   000000014008b778     win32_handmade.obj
+ 0002:00007788       $SG88112                   000000014008b788     win32_handmade.obj
+ 0002:00007798       $SG88155                   000000014008b798     win32_handmade.obj
+ 0002:000077a8       $SG88157                   000000014008b7a8     win32_handmade.obj
+ 0002:000077b8       $SG88159                   000000014008b7b8     win32_handmade.obj
+ 0002:000077c8       $SG88161                   000000014008b7c8     win32_handmade.obj
  0002:000077d8       $SG6473                    000000014008b7d8     win32_handmade.obj
  0002:000077f0       $SG6475                    000000014008b7f0     win32_handmade.obj
- 0002:00007808       $SG88504                   000000014008b808     win32_handmade.obj
- 0002:00007828       $SG88507                   000000014008b828     win32_handmade.obj
- 0002:00007838       $SG88532                   000000014008b838     win32_handmade.obj
- 0002:00007878       $SG88540                   000000014008b878     win32_handmade.obj
+ 0002:00007808       $SG88520                   000000014008b808     win32_handmade.obj
+ 0002:00007828       $SG88523                   000000014008b828     win32_handmade.obj
+ 0002:00007838       $SG88548                   000000014008b838     win32_handmade.obj
+ 0002:00007878       $SG88556                   000000014008b878     win32_handmade.obj
  0002:000079b8       $cppxdata$?_mbrtowc_internal@@YAHPEAHPEA_WPEBD_KPEAU_Mbstatet@@AEAV__crt_cached_ptd_host@@@Z 000000014008b9b8     libucrt:mbrtowc.obj
  0002:000079e8       $cppxdata$?_mbsrtowcs_helper@@YA_KPEA_WPEAPEBD_KPEAU_Mbstatet@@AEAV__crt_cached_ptd_host@@@Z 000000014008b9e8     libucrt:mbrtowc.obj
  0002:00007a20       ?LcidToLocaleNameTable@?A0x881e4c05@@3QBULcidToLocaleName@1@B 000000014008ba20     libucrt:lcidtoname_downlevel.obj

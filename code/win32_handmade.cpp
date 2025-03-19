@@ -733,6 +733,8 @@ Win32DebugSyncDisplay(win32_offscreen_buffer* backBuffer, int markerCount,
 
 	DWORD playColor = 0xFFFFFFFF;
 	DWORD writeColor = 0xFFFF0000;
+	DWORD expectedFlipColor = 0xFFFFFF00;
+	DWORD playWindowColor = 0xFFFF00FF;
 	
 	int top = padY;
 	int bottom = padY + lineHeight;
@@ -741,11 +743,12 @@ Win32DebugSyncDisplay(win32_offscreen_buffer* backBuffer, int markerCount,
 	    top += lineHeight + padY;
 	    bottom += lineHeight + padY;
 
+	    int firstTop = top;
 	    Win32DrawSoundBufferMarker(backBuffer, soundOutput, c, padX, top, bottom,
 				       thisMarker->outputPlayCursor, playColor);
 	    Win32DrawSoundBufferMarker(backBuffer, soundOutput, c, padX, top, bottom,
 				       thisMarker->outputWriteCursor, writeColor);
-
+	    
 	    top += lineHeight + padY;
 	    bottom += lineHeight + padY;
  
@@ -756,12 +759,18 @@ Win32DebugSyncDisplay(win32_offscreen_buffer* backBuffer, int markerCount,
 
 	    top += lineHeight + padY;
 	    bottom += lineHeight + padY;
+
+	    Win32DrawSoundBufferMarker(backBuffer, soundOutput, c, padX, firstTop, bottom,
+				       thisMarker->expectedFlipPlayCursor, expectedFlipColor);
+		    
 	}
 
 	Win32DrawSoundBufferMarker(backBuffer, soundOutput, c, padX, top, bottom,
 				   thisMarker->flipPlayCursor, playColor);
 	Win32DrawSoundBufferMarker(backBuffer, soundOutput, c, padX, top, bottom,
-				   thisMarker->flipWriteCursor, writeColor);
+				   thisMarker->flipWriteCursor, writeColor);	
+	Win32DrawSoundBufferMarker(backBuffer, soundOutput, c, padX, top, bottom,
+				   thisMarker->flipPlayCursor + 480*soundOutput->bytesPerSample, playWindowColor);
     }
     
 }
@@ -881,7 +890,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 
 		LARGE_INTEGER lastCounter = Win32GetWallClock();
 		uint64 lastCycleCount = __rdtsc();
-
+		LARGE_INTEGER flipWallClock = Win32GetWallClock();
+		
 		int debugTimeMarkerIndex = 0;
 		win32_debug_time_marker debugTimeMarkers[gameUpdateHz / 2] = {0};
 
@@ -1029,6 +1039,9 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 			DWORD playCursor;
 			DWORD writeCursor;
 
+			LARGE_INTEGER audioWallClock = Win32GetWallClock();
+			real32 fromBeginToAudioSeconds = 1000.0f*Win32GetSecondsElapsed(flipWallClock, audioWallClock);
+			
 			if (secondaryBuffer->GetCurrentPosition(&playCursor, &writeCursor) == DS_OK)
 			{
 			    /*
@@ -1069,6 +1082,9 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 			    DWORD expectedSoundBytesPerFrame =
 				(soundOutput.samplesPerSecond * soundOutput.bytesPerSample) / gameUpdateHz;
 
+			    real32 secondsLeftUntilFlip = (targetSecondsPerFrame - fromBeginToAudioSeconds);
+			    DWORD expectedBytesUntilFlip = (DWORD)((secondsLeftUntilFlip / targetSecondsPerFrame) * (real32)expectedSoundBytesPerFrame);
+			    
 			    DWORD expectedFrameBoundaryByte = playCursor + expectedSoundBytesPerFrame;
 
 			    DWORD safeWriteCursor = writeCursor;
@@ -1120,6 +1136,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 			    marker->outputWriteCursor = writeCursor;
 			    marker->outputLocation = byteToLock;
 			    marker->outputByteCount = bytesToWrite;
+			    marker->expectedFlipPlayCursor = expectedFrameBoundaryByte;
 			
 			    if (unwrappedWriteCursor < playCursor)
 			    {
@@ -1212,6 +1229,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 #endif		    
 			Win32DisplayBufferWindow(&globalBackBuffer, deviceContext, 0, 0, dimension.width, dimension.height);
 
+			flipWallClock = Win32GetWallClock();
+			
 
 			//this is debug code
 #if HANDMADE_INTERNAL
