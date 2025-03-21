@@ -30,7 +30,7 @@
 #include "win32_handmade.h"
 
 //this is a global for now
-global_variable bool running; //static also initializes all variables defined with it to 0
+global_variable bool32 running; //static also initializes all variables defined with it to 0
 global_variable bool32 pause;
 global_variable win32_offscreen_buffer globalBackBuffer;
 global_variable LPDIRECTSOUNDBUFFER secondaryBuffer;
@@ -221,23 +221,31 @@ Win32InitDSound(HWND window, int32 samplesPerSecond, int32 bufferSize)
 	
 }
 
-struct win32_game_code
+inline FILETIME
+Win32GetLastWriteTime(char* filename)
 {
-    HMODULE gameCodeDLL; //saving this so we can use it to free old stuff later
-    game_update_and_render* UpdateAndRender;
-    game_get_sound_samples* GetSoundSamples;
-
-    bool32 isValid;
-};
+    WIN32_FIND_DATA findData = {};
+    HANDLE findHandle = FindFirstFile(filename, &findData);
+    FILETIME lastWriteTime = {};
+    if (findHandle != INVALID_HANDLE_VALUE)
+    {
+	lastWriteTime = findData.ftLastWriteTime;
+	FindClose(findHandle);
+    }
+    
+    return(lastWriteTime);
+}
 
 internal win32_game_code
-Win32LoadGameCode(void)
+Win32LoadGameCode(char* sourceDLLName, char* tempDLLName)
 {
     win32_game_code result = {};
 
+
+    result.dllLastWriteTime = Win32GetLastWriteTime(sourceDLLName);
     //this doesn't really work unless we set the working directory, but I don't wanna do that rn
-    CopyFile("handmade.exe", "handmade_temp.dll", FALSE); //stops us from locking the file when we want to reload it
-    result.gameCodeDLL = LoadLibrary("handmade_temp.dll");
+    CopyFile(sourceDLLName, tempDLLName, FALSE); //stops us from locking the file when we want to reload it
+    result.gameCodeDLL = LoadLibrary(tempDLLName);    
     if (result.gameCodeDLL)
     {
 	result.UpdateAndRender = (game_update_and_render*)GetProcAddress(result.gameCodeDLL, "GameUpdateAndRender");
@@ -796,11 +804,53 @@ Win32DebugSyncDisplay(win32_offscreen_buffer* backBuffer, int markerCount,
     
 }
 
+internal void
+CatStrings(size_t sourceACount, char* sourceA,
+	   size_t sourceBCount, char* sourceB,
+	   size_t destCount, char* dest)
+{
+    for (int index = 0; index < sourceACount; ++index)
+    {
+	*dest++ = *sourceA++;
+    }
+    for (int index = 0; index < sourceBCount; ++index)
+    {
+	*dest++ = *sourceB++;
+    }
+    *dest++ = 0;
+}
+
 int CALLBACK WinMain(HINSTANCE hInstance,
 		     HINSTANCE hPrevInstance,
 		     LPSTR lpCmdLine,
 		     int nCmdShow)
 {
+    char exeFilename[MAX_PATH];
+    DWORD sizeOfFilename = GetModuleFileName(0, exeFilename, sizeof(exeFilename));
+    char *onePastLastSlash = exeFilename;
+    for (char* scan = exeFilename; *scan; ++scan)
+    {
+	if (*scan == '\\')
+	{
+	    onePastLastSlash = scan + 1;
+	}
+    }
+    char sourceGameCodeDLLFilename[] = "handmade.dll";
+    char sourceGameCodeDLLFullPath[MAX_PATH];
+    CatStrings(onePastLastSlash  - exeFilename, exeFilename,
+	       sizeof(sourceGameCodeDLLFilename) - 1, sourceGameCodeDLLFilename,
+	       sizeof(sourceGameCodeDLLFullPath), sourceGameCodeDLLFullPath);
+
+    char tempGameCodeDLLFilename[] = "handmade_temp.dll";
+    char tempGameCodeDLLFullPath[MAX_PATH];
+    CatStrings(onePastLastSlash  - exeFilename, exeFilename,
+	       sizeof(tempGameCodeDLLFilename) - 1, tempGameCodeDLLFilename,
+	       sizeof(tempGameCodeDLLFullPath), tempGameCodeDLLFullPath);
+
+
+
+    
+    
     LARGE_INTEGER perfCountFrequencyResult;
     QueryPerformanceFrequency(&perfCountFrequencyResult);
     perfCountFrequency = perfCountFrequencyResult.QuadPart;
@@ -926,20 +976,23 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		DWORD audioLatencyBytes = 0;
 		real32 audioLatencySeconds = 0;
 		bool32 soundIsValid = false;
-		
-		win32_game_code game = Win32LoadGameCode();
-		uint32 loadCounter = 120;
 
+		char* sourceDLLName = "handmade.dll";
+		win32_game_code game = Win32LoadGameCode(sourceGameCodeDLLFullPath, tempGameCodeDLLFullPath);
+		uint32 loadCounter = 120;
+		
+		
 		/*
 		  Start of the main game loop
 		  
 		 */
 		while(running)
 		{
-		    if (loadCounter++ > 120)
+		    FILETIME newDLLWriteTime = Win32GetLastWriteTime(sourceGameCodeDLLFullPath);
+		    if (CompareFileTime(&newDLLWriteTime, &game.dllLastWriteTime) != 0)
 		    {
 			Win32UnloadGameCode(&game);
-			game = Win32LoadGameCode();
+			game = Win32LoadGameCode(sourceGameCodeDLLFullPath, tempGameCodeDLLFullPath);
 			loadCounter = 0;
 		    }
 
@@ -1327,4 +1380,5 @@ int CALLBACK WinMain(HINSTANCE hInstance,
     
     return(0);
 }
+ 
  
