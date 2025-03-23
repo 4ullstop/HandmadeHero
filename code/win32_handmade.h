@@ -50,5 +50,18 @@ struct win32_game_code
 
     bool32 isValid;
 };
+
+struct win32_state
+{
+    uint64 totalSize;
+    void* gameMemoryBlock;
+    
+    HANDLE recordingHandle;
+    int inputRecordingIndex;
+
+    HANDLE playbackHandle;
+    int inputPlayingIndex;
+};
+
 #define WIN32_HANDMADE_H
 #endif

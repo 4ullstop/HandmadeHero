@@ -8,11 +8,14 @@ GameOutputSound(game_state* gameState, game_sound_output_buffer *soundBuffer, in
     int wavePeriod = soundBuffer->samplesPerSecond / toneHz;
     for (int sampleIndex = 0; sampleIndex < soundBuffer->sampleCount; ++sampleIndex)
     {
+#if 0	
 	real32 sineValue = sinf(gameState->tSine);
 	int16 sampleValue = (int16)(sineValue * toneVolume);
 	*sampleOut++ = sampleValue;
 	*sampleOut++ = sampleValue;
-	
+#else
+	int16 sampleValue = 0;
+#endif	
 	gameState->tSine += 2.0f*Pi32*1.0f/(real32)wavePeriod;
 	if (gameState->tSine > 2.0f*Pi32)
 	{
@@ -40,6 +43,29 @@ RenderGradient(game_offscreen_buffer* buffer, int xOffset, int yOffset)
     }
 }
 
+internal void
+RenderPlayer(game_offscreen_buffer* backBuffer, int playerX, int playerY)
+{
+    uint8* endOfBuffer = (uint8*)backBuffer->memory +
+	backBuffer->pitch*backBuffer->height;
+    uint32 color = 0xFFFFFFFF;
+    int top = playerY;
+    int bottom = playerY + 10;
+    
+    for (int x = playerX; x < playerX + 10; ++x)
+    {
+	uint8* pixel = ((uint8*)backBuffer->memory + x * backBuffer->bytesPerPixel + top * backBuffer->pitch);
+	for (int y = top; y < bottom; ++y)
+	{
+	    if ((pixel >= backBuffer->memory) && (pixel < endOfBuffer))
+	    {
+		*(uint32*)pixel = color;
+	    }
+	    pixel += backBuffer->pitch;
+	}
+    }
+}
+
 extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 {
     Assert((&input->controllers[0].terminator - &input->controllers[0].buttons[0]) ==
@@ -62,6 +88,9 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	gameState->toneHz = 256;
 	gameState->tSine = 0.0f;
 	memory->isInitialized = true;
+
+	gameState->playerX = 100;
+	gameState->playerY = 100;
     }
 
     for (int controllerIndex = 0; controllerIndex < ArrayCount(input->controllers); ++controllerIndex)
@@ -92,10 +121,20 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	{
 	    gameState->greenOffset += 1;
 	}
+	gameState->playerX += (int)(4.0f*controller->stickAverageX);
+	gameState->playerY -= (int)(4.0f*controller->stickAverageY + 10.0f * sinf(gameState->tJump));
+/*
+	if (controller->actionDown.endedDown)
+	{
+	    gameState->tJump = 1.0;
+	}
+	gameState->tJump -= 0.033f;
+*/	    
     }
     
 
     RenderGradient(buffer, gameState->blueOffset, gameState->greenOffset);
+    RenderPlayer(buffer, gameState->playerX, gameState->playerY);
 }
 
 extern "C" GAME_GET_SOUND_SAMPLES(GameGetSoundSamples)

@@ -1,6 +1,6 @@
  handmade
 
- Timestamp is 67dd7d4e (Fri Mar 21 10:53:02 2025)
+ Timestamp is 67de0ca2 (Fri Mar 21 21:04:34 2025)
 
  Preferred load address is 0000000180000000
 
@@ -79,10 +79,6 @@
  0000:00000000       __x64_code_ranges_to_entry_points_count 0000000000000000     <absolute>
  0000:00000100       __guard_flags              0000000000000100     <absolute>
  0000:00000000       __ImageBase                0000000180000000     <linker-defined>
- 0001:00006120       ?GameUpdateAndRenderStub@@YAXPEAUgame_memory@@PEAUgame_input@@PEAUgame_offscreen_buffer@@@Z 0000000180007120 f   handmade.obj
- 0001:00006140       ?GameGetSoundSamplesStub@@YAXPEAUgame_memory@@PEAUgame_sound_output_buffer@@@Z 0000000180007140 f   handmade.obj
- 0001:00006380       GameUpdateAndRender        0000000180007380 f   handmade.obj
- 0001:000065e0       GameGetSoundSamples        00000001800075e0 f   handmade.obj
  0001:00006760       ?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@I@Z 0000000180007760 f i handmade.obj
  0001:00006bb4       _CRT_INIT                  0000000180007bb4 f   LIBCMT:dll_dllmain.obj
  0001:00006bbc       _DllMainCRTStartup         0000000180007bbc f   LIBCMT:dll_dllmain.obj
@@ -2645,6 +2641,10 @@
  0001:000779c0       strrchr                    00000001800789c0 f   libvcruntime:strrchr.obj
  0001:00077b4c       _local_unwind              0000000180078b4c f   libvcruntime:jmpuwind.obj
  0001:00077b80       RtlUnwind                  0000000180078b80 f   kernel32:KERNEL32.dll
+ 0001:00077b90       ?GameUpdateAndRenderStub@@YAXPEAUgame_memory@@PEAUgame_input@@PEAUgame_offscreen_buffer@@@Z 0000000180078b90 f   handmade.obj
+ 0001:00077bb0       ?GameGetSoundSamplesStub@@YAXPEAUgame_memory@@PEAUgame_sound_output_buffer@@@Z 0000000180078bb0 f   handmade.obj
+ 0001:00077ea0       GameUpdateAndRender        0000000180078ea0 f   handmade.obj
+ 0001:000781c0       GameGetSoundSamples        00000001800791c0 f   handmade.obj
  0001:0007b020       _guard_dispatch_icall_nop  000000018007c020 f   LIBCMT:guard_dispatch.obj
  0001:0007b040       _guard_xfg_dispatch_icall_nop 000000018007c040 f   LIBCMT:guard_xfg_dispatch.obj
  0001:0007c080       memset_repstos             000000018007d080 f   libvcruntime:memset.obj
@@ -2668,9 +2668,10 @@
  0002:000008b0       __xp_z                     00000001800818b0     LIBCMT:initializers.obj
  0002:000009c0       __xt_a                     00000001800819c0     LIBCMT:initializers.obj
  0002:00000ad0       __xt_z                     0000000180081ad0     LIBCMT:initializers.obj
+ 0002:00000c0c       __real@43000000            0000000180081c0c     handmade.obj
  0002:00000c14       __real@40800000            0000000180081c14     handmade.obj
  0002:00000c18       __real@40c90fdb            0000000180081c18     handmade.obj
- 0002:00000c1c       __real@43000000            0000000180081c1c     handmade.obj
+ 0002:00000c1c       __real@41200000            0000000180081c1c     handmade.obj
  0002:00000c20       _pDefaultRawDllMain        0000000180081c20     LIBCMT:dll_dllmain.obj
  0002:00000c20       _pRawDllMain               0000000180081c20     LIBCMT:dll_dllmain.obj
  0002:00000c30       __xmm@ffffffffffffffffffffffffffffffff 0000000180081c30     LIBCMT:utility.obj
@@ -7855,8 +7856,6 @@
  0000:00000000       _volmd                     0000000180000000     libvcruntime:winapi_downlevel.obj
  0000:00000000       _volmd                     0000000180000000     libvcruntime:winapi_downlevel.obj
  0000:fff5f004       __guard_fids__             0000000180000004     libucrt:stdio_initializer.obj
- 0001:00006160       ?GameOutputSound@@YAXPEAUgame_state@@PEAUgame_sound_output_buffer@@H@Z 0000000180007160 f   handmade.obj
- 0001:000062a0       ?RenderGradient@@YAXPEAUgame_offscreen_buffer@@HH@Z 00000001800072a0 f   handmade.obj
  0001:000067b4       ?dllmain_crt_dispatch@@YAHQEAUHINSTANCE__@@KQEAX@Z 00000001800077b4 f   LIBCMT:dll_dllmain.obj
  0001:00006818       ?dllmain_crt_process_attach@@YAHQEAUHINSTANCE__@@QEAX@Z 0000000180007818 f   LIBCMT:dll_dllmain.obj
  0001:00006974       ?dllmain_crt_process_detach@@YAH_N@Z 0000000180007974 f   LIBCMT:dll_dllmain.obj
@@ -8720,6 +8719,9 @@
  0001:00077438       capture_current_context    0000000180078438 f   LIBCMT:gs_report.obj
  0001:000774c0       capture_previous_context   00000001800784c0 f   LIBCMT:gs_report.obj
  0001:00077550       $$000000                   0000000180078550     LIBCMT:chkstk.obj
+ 0001:00077bd0       ?GameOutputSound@@YAXPEAUgame_state@@PEAUgame_sound_output_buffer@@H@Z 0000000180078bd0 f   handmade.obj
+ 0001:00077ca0       ?RenderGradient@@YAXPEAUgame_offscreen_buffer@@HH@Z 0000000180078ca0 f   handmade.obj
+ 0001:00077d80       ?RenderPlayer@@YAXPEAUgame_offscreen_buffer@@HH@Z 0000000180078d80 f   handmade.obj
  0001:0007b010       $$000000                   000000018007c010     LIBCMT:guard_dispatch.obj
  0001:0007b030       $$000000                   000000018007c030     LIBCMT:guard_xfg_dispatch.obj
  0001:0007c080       $$000000                   000000018007d080     libvcruntime:memset.obj
@@ -8930,8 +8932,8 @@
  0001:0007eb20       ?fin$0@?0??__acrt_stdio_allocate_stream@@YA?AV__crt_stdio_stream@@XZ@4HA 000000018007fb20 f   libucrt:stream.obj
  0001:0007eb3f       common_control87$filt$0    000000018007fb3f f   libucrt:ieee.obj
  0001:0007eb80       _IsNonwritableInCurrentImage$filt$0 000000018007fb80 f   LIBCMT:pesect.obj
- 0002:00000be0       $SG4110                    0000000180081be0     handmade.obj
- 0002:00000bf8       $SG4112                    0000000180081bf8     handmade.obj
+ 0002:00000be0       $SG4135                    0000000180081be0     handmade.obj
+ 0002:00000bf8       $SG4137                    0000000180081bf8     handmade.obj
  0002:00000c60       ?tokenTable@@3QBUStringLiteral@@B 0000000180081c60     libvcruntime:undname.obj
  0002:00000d70       ?nameTable@@3QBUStringLiteral@@B 0000000180081d70     libvcruntime:undname.obj
  0002:000012a0       ?rttiTable@@3QBUStringLiteral@@B 00000001800822a0     libvcruntime:undname.obj
@@ -9072,10 +9074,6 @@
  0002:0000da74       MoveSmallYmmNT             000000018008ea74     libvcruntime:memcpy.obj
  0002:0000da98       MoveSmallXmm               000000018008ea98     libvcruntime:memcpy.obj
  0002:0000eb40       $unwind$?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@I@Z 000000018008fb40     handmade.obj
- 0002:0000eb48       $unwind$?GameOutputSound@@YAXPEAUgame_state@@PEAUgame_sound_output_buffer@@H@Z 000000018008fb48     handmade.obj
- 0002:0000eb50       $unwind$?RenderGradient@@YAXPEAUgame_offscreen_buffer@@HH@Z 000000018008fb50     handmade.obj
- 0002:0000eb58       $unwind$GameUpdateAndRender 000000018008fb58     handmade.obj
- 0002:0000eb64       $unwind$GameGetSoundSamples 000000018008fb64     handmade.obj
  0002:0000eb70       $unwind$?dllmain_crt_process_attach@@YAHQEAUHINSTANCE__@@QEAX@Z 000000018008fb70     LIBCMT:dll_dllmain.obj
  0002:0000ebb4       $unwind$?fin$0@?0??dllmain_crt_process_attach@@YAHQEAUHINSTANCE__@@QEAX@Z@4HA 000000018008fbb4     LIBCMT:dll_dllmain.obj
  0002:0000ebbc       $unwind$?dllmain_crt_process_detach@@YAH_N@Z 000000018008fbbc     LIBCMT:dll_dllmain.obj
@@ -10616,6 +10614,11 @@
  0002:00015554       $unwind$strrchr            0000000180096554     libvcruntime:strrchr.obj
  0002:0001555c       $unwind$_local_unwind      000000018009655c     libvcruntime:jmpuwind.obj
  0002:00015568       $xdatasym$memcmp           0000000180096568     libvcruntime:memcmp.obj
+ 0002:0001556c       $unwind$?GameOutputSound@@YAXPEAUgame_state@@PEAUgame_sound_output_buffer@@H@Z 000000018009656c     handmade.obj
+ 0002:00015574       $unwind$?RenderGradient@@YAXPEAUgame_offscreen_buffer@@HH@Z 0000000180096574     handmade.obj
+ 0002:0001557c       $unwind$?RenderPlayer@@YAXPEAUgame_offscreen_buffer@@HH@Z 000000018009657c     handmade.obj
+ 0002:00015584       $unwind$GameUpdateAndRender 0000000180096584     handmade.obj
+ 0002:00015590       $unwind$GameGetSoundSamples 0000000180096590     handmade.obj
  0002:00015d30       .edata                     0000000180096d30     handmade.exp
  0002:00015d58       rgpv                       0000000180096d58     handmade.exp
  0002:00015d60       rgszName                   0000000180096d60     handmade.exp
