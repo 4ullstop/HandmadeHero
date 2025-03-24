@@ -8,14 +8,14 @@ GameOutputSound(game_state* gameState, game_sound_output_buffer *soundBuffer, in
     int wavePeriod = soundBuffer->samplesPerSecond / toneHz;
     for (int sampleIndex = 0; sampleIndex < soundBuffer->sampleCount; ++sampleIndex)
     {
-#if 0	
+
 	real32 sineValue = sinf(gameState->tSine);
 	int16 sampleValue = (int16)(sineValue * toneVolume);
+
+
+
 	*sampleOut++ = sampleValue;
 	*sampleOut++ = sampleValue;
-#else
-	int16 sampleValue = 0;
-#endif	
 	gameState->tSine += 2.0f*Pi32*1.0f/(real32)wavePeriod;
 	if (gameState->tSine > 2.0f*Pi32)
 	{
@@ -36,7 +36,7 @@ RenderGradient(game_offscreen_buffer* buffer, int xOffset, int yOffset)
 	    uint8 blue = (uint8)(x + xOffset);
 	    uint8 green = (uint8)(y + yOffset);
 	    
-	    *pixel++ = ((green << 8) | blue);
+	    *pixel++ = ((green << 16) | blue);
 
 	}
 	row += buffer->pitch;
