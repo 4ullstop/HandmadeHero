@@ -78,11 +78,11 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
     {
 	char* fileName = __FILE__;
 
-	debug_read_file_result file = memory->DEBUGPlatformReadEntireFile(fileName);
+	debug_read_file_result file = memory->DEBUGPlatformReadEntireFile(thread, fileName);
 	if (file.contents)
 	{
-	    memory->DEBUGPlatformWriteEntireFile("w:/data/test.out", file.contentsSize, file.contents);
-	    memory->DEBUGPlatformFreeFileMemory(file.contents);
+	    memory->DEBUGPlatformWriteEntireFile(thread, "w:/data/test.out", file.contentsSize, file.contents);
+	    memory->DEBUGPlatformFreeFileMemory(thread, file.contents);
 	}
 			
 	gameState->toneHz = 256;
@@ -135,6 +135,14 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 
     RenderGradient(buffer, gameState->blueOffset, gameState->greenOffset);
     RenderPlayer(buffer, gameState->playerX, gameState->playerY);
+    RenderPlayer(buffer, input->mouseX, input->mouseY);
+    for (int buttonIndex = 0; buttonIndex < ArrayCount(input->mouseButtons); ++buttonIndex)
+    {
+	if (input->mouseButtons[buttonIndex].endedDown)
+	{
+	    RenderPlayer(buffer, 10 + 20 * buttonIndex, 10);
+	}
+    }
 }
 
 extern "C" GAME_GET_SOUND_SAMPLES(GameGetSoundSamples)

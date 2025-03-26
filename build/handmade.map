@@ -1,6 +1,6 @@
  handmade
 
- Timestamp is 67e1b75f (Mon Mar 24 15:49:51 2025)
+ Timestamp is 67e435ca (Wed Mar 26 13:13:46 2025)
 
  Preferred load address is 0000000180000000
 
@@ -80,7 +80,7 @@
  0000:00000100       __guard_flags              0000000000000100     <absolute>
  0000:00000000       __ImageBase                0000000180000000     <linker-defined>
  0001:000067e0       GameUpdateAndRender        00000001800077e0 f   handmade.obj
- 0001:00006b00       GameGetSoundSamples        0000000180007b00 f   handmade.obj
+ 0001:00006b90       GameGetSoundSamples        0000000180007b90 f   handmade.obj
  0001:00006d30       ?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@I@Z 0000000180007d30 f i handmade.obj
  0001:00007290       _CRT_INIT                  0000000180008290 f   LIBCMTD:dll_dllmain.obj
  0001:000072d0       _DllMainCRTStartup         00000001800082d0 f   LIBCMTD:dll_dllmain.obj
@@ -10364,8 +10364,8 @@
  0001:000e18b0       ?fin$0@?0???$?RV<lambda_19eaff14c5fe7be5b1b106a862eb1091>@@AEAV<lambda_af29824b49a67d335554598d6cad2be6>@@V<lambda_3ce37f5b621ab310299ea5f68cbdf3bb>@@@?$__crt_seh_guarded_call@H@@QEAAH$$QEAV<lambda_19eaff14c5fe7be5b1b106a862eb1091>@@AEAV<lambda_af29824b49a67d335554598d6cad2be6>@@$$QEAV<lambda_3ce37f5b621ab310299ea5f68cbdf3bb>@@@Z@4HA 00000001800e28b0 f   libucrtd:close.obj
  0001:000e18d0       ?fin$0@?0??__acrt_stdio_allocate_stream@@YA?AV__crt_stdio_stream@@XZ@4HA 00000001800e28d0 f   libucrtd:stream.obj
  0001:000e1900       _IsNonwritableInCurrentImage$filt$0 00000001800e2900 f   LIBCMTD:pesect.obj
- 0002:00000be0       $SG4134                    00000001800e4be0     handmade.obj
- 0002:00000bf8       $SG4136                    00000001800e4bf8     handmade.obj
+ 0002:00000be0       $SG4160                    00000001800e4be0     handmade.obj
+ 0002:00000bf8       $SG4162                    00000001800e4bf8     handmade.obj
  0002:00000c38       GS_ExceptionPointers       00000001800e4c38     LIBCMTD:gs_report.obj
  0002:00000cb0       ?tokenTable@@3QBUStringLiteral@@B 00000001800e4cb0     libvcruntimed:undname.obj
  0002:00000dc0       ?nameTable@@3QBUStringLiteral@@B 00000001800e4dc0     libvcruntimed:undname.obj
