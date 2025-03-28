@@ -1,6 +1,6 @@
  handmade
 
- Timestamp is 67e435ca (Wed Mar 26 13:13:46 2025)
+ Timestamp is 67e5e586 (Thu Mar 27 19:55:50 2025)
 
  Preferred load address is 0000000180000000
 
@@ -79,8 +79,8 @@
  0000:00000000       __x64_code_ranges_to_entry_points_count 0000000000000000     <absolute>
  0000:00000100       __guard_flags              0000000000000100     <absolute>
  0000:00000000       __ImageBase                0000000180000000     <linker-defined>
- 0001:000067e0       GameUpdateAndRender        00000001800077e0 f   handmade.obj
- 0001:00006b90       GameGetSoundSamples        0000000180007b90 f   handmade.obj
+ 0001:00006700       GameUpdateAndRender        0000000180007700 f   handmade.obj
+ 0001:00006820       GameGetSoundSamples        0000000180007820 f   handmade.obj
  0001:00006d30       ?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@I@Z 0000000180007d30 f i handmade.obj
  0001:00007290       _CRT_INIT                  0000000180008290 f   LIBCMTD:dll_dllmain.obj
  0001:000072d0       _DllMainCRTStartup         00000001800082d0 f   LIBCMTD:dll_dllmain.obj
@@ -2758,10 +2758,9 @@
  0002:000008b0       __xp_z                     00000001800e48b0     LIBCMTD:initializers.obj
  0002:000009c0       __xt_a                     00000001800e49c0     LIBCMTD:initializers.obj
  0002:00000ad0       __xt_z                     00000001800e4ad0     LIBCMTD:initializers.obj
- 0002:00000c14       __real@40800000            00000001800e4c14     handmade.obj
- 0002:00000c18       __real@40c90fdb            00000001800e4c18     handmade.obj
- 0002:00000c1c       __real@41200000            00000001800e4c1c     handmade.obj
- 0002:00000c20       __real@43000000            00000001800e4c20     handmade.obj
+ 0002:00000be0       __real@3f000000            00000001800e4be0     handmade.obj
+ 0002:00000be4       __real@41200000            00000001800e4be4     handmade.obj
+ 0002:00000be8       __real@41f00000            00000001800e4be8     handmade.obj
  0002:00000c28       _pDefaultRawDllMain        00000001800e4c28     LIBCMTD:dll_dllmain.obj
  0002:00000c28       _pRawDllMain               00000001800e4c28     LIBCMTD:dll_dllmain.obj
  0002:00000c50       ??_C@_0EC@CDJPIOJK@D?3?2a?2_work?21?2s?2src?2vctools?2crt?2@ 00000001800e4c50     libvcruntimed:std_type_info.obj
@@ -9114,8 +9113,8 @@
  0000:00000000       _volmd                     0000000180000000     libvcruntimed:winapi_downlevel.obj
  0000:ffedb004       __guard_fids__             0000000180000004     libucrtd:stdio_initializer.obj
  0001:000064a0       ?GameOutputSound@@YAXPEAUgame_state@@PEAUgame_sound_output_buffer@@H@Z 00000001800074a0 f   handmade.obj
- 0001:000065e0       ?RenderGradient@@YAXPEAUgame_offscreen_buffer@@HH@Z 00000001800075e0 f   handmade.obj
- 0001:000066c0       ?RenderPlayer@@YAXPEAUgame_offscreen_buffer@@HH@Z 00000001800076c0 f   handmade.obj
+ 0001:00006550       ?RoundReal32ToInt32@@YAHM@Z 0000000180007550 f   handmade.obj
+ 0001:00006580       ?DrawRectangle@@YAXPEAUgame_offscreen_buffer@@MMMM@Z 0000000180007580 f   handmade.obj
  0001:00006d90       ?dllmain_crt_dispatch@@YAHQEAUHINSTANCE__@@KQEAX@Z 0000000180007d90 f   LIBCMTD:dll_dllmain.obj
  0001:00006e40       ?dllmain_crt_process_attach@@YAHQEAUHINSTANCE__@@QEAX@Z 0000000180007e40 f   LIBCMTD:dll_dllmain.obj
  0001:00006fd0       ?dllmain_crt_process_detach@@YAH_N@Z 0000000180007fd0 f   LIBCMTD:dll_dllmain.obj
@@ -10364,8 +10363,6 @@
  0001:000e18b0       ?fin$0@?0???$?RV<lambda_19eaff14c5fe7be5b1b106a862eb1091>@@AEAV<lambda_af29824b49a67d335554598d6cad2be6>@@V<lambda_3ce37f5b621ab310299ea5f68cbdf3bb>@@@?$__crt_seh_guarded_call@H@@QEAAH$$QEAV<lambda_19eaff14c5fe7be5b1b106a862eb1091>@@AEAV<lambda_af29824b49a67d335554598d6cad2be6>@@$$QEAV<lambda_3ce37f5b621ab310299ea5f68cbdf3bb>@@@Z@4HA 00000001800e28b0 f   libucrtd:close.obj
  0001:000e18d0       ?fin$0@?0??__acrt_stdio_allocate_stream@@YA?AV__crt_stdio_stream@@XZ@4HA 00000001800e28d0 f   libucrtd:stream.obj
  0001:000e1900       _IsNonwritableInCurrentImage$filt$0 00000001800e2900 f   LIBCMTD:pesect.obj
- 0002:00000be0       $SG4160                    00000001800e4be0     handmade.obj
- 0002:00000bf8       $SG4162                    00000001800e4bf8     handmade.obj
  0002:00000c38       GS_ExceptionPointers       00000001800e4c38     LIBCMTD:gs_report.obj
  0002:00000cb0       ?tokenTable@@3QBUStringLiteral@@B 00000001800e4cb0     libvcruntimed:undname.obj
  0002:00000dc0       ?nameTable@@3QBUStringLiteral@@B 00000001800e4dc0     libvcruntimed:undname.obj
@@ -10586,10 +10583,10 @@
  0002:00027bb8       SetSmallXmm                000000018010bbb8     libvcruntimed:memset.obj
  0002:00028c40       $unwind$?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@I@Z 000000018010cc40     handmade.obj
  0002:00028c48       $unwind$?GameOutputSound@@YAXPEAUgame_state@@PEAUgame_sound_output_buffer@@H@Z 000000018010cc48     handmade.obj
- 0002:00028c50       $unwind$?RenderGradient@@YAXPEAUgame_offscreen_buffer@@HH@Z 000000018010cc50     handmade.obj
- 0002:00028c58       $unwind$?RenderPlayer@@YAXPEAUgame_offscreen_buffer@@HH@Z 000000018010cc58     handmade.obj
+ 0002:00028c50       $unwind$?RoundReal32ToInt32@@YAHM@Z 000000018010cc50     handmade.obj
+ 0002:00028c58       $unwind$?DrawRectangle@@YAXPEAUgame_offscreen_buffer@@MMMM@Z 000000018010cc58     handmade.obj
  0002:00028c60       $unwind$GameUpdateAndRender 000000018010cc60     handmade.obj
- 0002:00028c6c       $unwind$GameGetSoundSamples 000000018010cc6c     handmade.obj
+ 0002:00028c68       $unwind$GameGetSoundSamples 000000018010cc68     handmade.obj
  0002:00028c78       $unwind$?dllmain_crt_process_attach@@YAHQEAUHINSTANCE__@@QEAX@Z 000000018010cc78     LIBCMTD:dll_dllmain.obj
  0002:00028c9c       $unwind$?fin$0@?0??dllmain_crt_process_attach@@YAHQEAUHINSTANCE__@@QEAX@Z@4HA 000000018010cc9c     LIBCMTD:dll_dllmain.obj
  0002:00028ca4       $unwind$?dllmain_crt_process_detach@@YAH_N@Z 000000018010cca4     LIBCMTD:dll_dllmain.obj

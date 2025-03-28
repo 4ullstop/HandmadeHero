@@ -144,8 +144,7 @@ DEBUG_PLATFORM_READ_ENTIRE_FILE(DEBUGPlatformReadEntireFile)
 		}
 		else
 		{
-		    thread_context threadContext = {};
-		    DEBUGPlatformFreeFileMemory(&threadContext, result.contents);
+		    DEBUGPlatformFreeFileMemory(thread, result.contents);
 		    result.contents = 0;
 		}
 	    }
@@ -1029,7 +1028,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	
     
     Win32LoadXInput();
-    Win32ResizeDIBSection(&globalBackBuffer, 1280, 720);
+    Win32ResizeDIBSection(&globalBackBuffer, 960, 540);
 			  
     WNDCLASS windowClass = {};
     windowClass.style = CS_HREDRAW|CS_VREDRAW|CS_OWNDC;
@@ -1187,7 +1186,8 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		game_input input[2] = {};
 		game_input* newInput = &input[0];
 		game_input* oldInput = &input[1];
-
+		newInput->secondsToAdvanceOverUpdate = targetSecondsPerFrame;
+		
 		LARGE_INTEGER lastCounter = Win32GetWallClock();
 		uint64 lastCycleCount = __rdtsc();
 		LARGE_INTEGER flipWallClock = Win32GetWallClock();

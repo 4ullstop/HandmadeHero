@@ -1,6 +1,6 @@
  win32_handmade
 
- Timestamp is 67e435f6 (Wed Mar 26 13:14:30 2025)
+ Timestamp is 67e5e542 (Thu Mar 27 19:54:42 2025)
 
  Preferred load address is 0000000140000000
 
@@ -85,10 +85,10 @@
  0000:00000100       __guard_flags              0000000000000100     <absolute>
  0000:00000000       __ImageBase                0000000140000000     <linker-defined>
  0001:00000000       WinMain                    0000000140001000 f   win32_handmade.obj
- 0001:000017f0       ?XInputGetStateStub@@YAKKPEAU_XINPUT_STATE@@@Z 00000001400027f0 f   win32_handmade.obj
- 0001:00001810       ?XInputSetStateStub@@YAKKPEAU_XINPUT_STATE@@@Z 0000000140002810 f   win32_handmade.obj
- 0001:00001a90       ?DEBUGPlatformFreeFileMemory@@YAXPEAUthread_context@@PEAX@Z 0000000140002a90 f   win32_handmade.obj
- 0001:00001ac0       ?DEBUGPlatformReadEntireFile@@YA?AUdebug_read_file_result@@PEAUthread_context@@PEAD@Z 0000000140002ac0 f   win32_handmade.obj
+ 0001:00001800       ?XInputGetStateStub@@YAKKPEAU_XINPUT_STATE@@@Z 0000000140002800 f   win32_handmade.obj
+ 0001:00001820       ?XInputSetStateStub@@YAKKPEAU_XINPUT_STATE@@@Z 0000000140002820 f   win32_handmade.obj
+ 0001:00001aa0       ?DEBUGPlatformFreeFileMemory@@YAXPEAUthread_context@@PEAX@Z 0000000140002aa0 f   win32_handmade.obj
+ 0001:00001ad0       ?DEBUGPlatformReadEntireFile@@YA?AUdebug_read_file_result@@PEAUthread_context@@PEAD@Z 0000000140002ad0 f   win32_handmade.obj
  0001:00001c20       ?DEBUGPlatformWriteEntireFile@@YAHPEAUthread_context@@PEADIPEAX@Z 0000000140002c20 f   win32_handmade.obj
  0001:00002350       ?Win32MainWindowProc@@YA_JPEAUHWND__@@I_K_J@Z 0000000140003350 f   win32_handmade.obj
  0001:000033b0       ?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@I@Z 00000001400043b0 f i win32_handmade.obj
@@ -9283,10 +9283,10 @@
  0000:00000040       _volmd                     0000000140000040     win32_handmade.obj
  0000:00000050       _volmd                     0000000140000050     win32_handmade.obj
  0000:00000060       _volmd                     0000000140000060     win32_handmade.obj
- 0001:00001830       ?CatStrings@@YAX_KPEAD0101@Z 0000000140002830 f   win32_handmade.obj
- 0001:00001900       ?Win32GetEXEFilename@@YAXPEAUwin32_state@@@Z 0000000140002900 f   win32_handmade.obj
- 0001:000019a0       ?StringLength@@YAHPEAD@Z   00000001400029a0 f   win32_handmade.obj
- 0001:000019f0       ?Win32BuildEXEPathFilename@@YAXPEAUwin32_state@@PEADH1@Z 00000001400029f0 f   win32_handmade.obj
+ 0001:00001840       ?CatStrings@@YAX_KPEAD0101@Z 0000000140002840 f   win32_handmade.obj
+ 0001:00001910       ?Win32GetEXEFilename@@YAXPEAUwin32_state@@@Z 0000000140002910 f   win32_handmade.obj
+ 0001:000019b0       ?StringLength@@YAHPEAD@Z   00000001400029b0 f   win32_handmade.obj
+ 0001:00001a00       ?Win32BuildEXEPathFilename@@YAXPEAUwin32_state@@PEADH1@Z 0000000140002a00 f   win32_handmade.obj
  0001:00001cf0       ?Win32InitDSound@@YAXPEAUHWND__@@HH@Z 0000000140002cf0 f   win32_handmade.obj
  0001:00001f00       ?Win32LoadGameCode@@YA?AUwin32_game_code@@PEAD0@Z 0000000140002f00 f   win32_handmade.obj
  0001:00002020       ?Win32UnloadGameCode@@YAXPEAUwin32_game_code@@@Z 0000000140003020 f   win32_handmade.obj
@@ -10562,29 +10562,29 @@
  0002:00000438       ?pre_cpp_initializer@@3P6AXXZEA 00000001400b0438     LIBCMTD:exe_winmain.obj
  0002:00000450       ?pre_c_initializer@@3P6AHXZEA 00000001400b0450     LIBCMTD:exe_winmain.obj
  0002:00000458       ?post_pgo_initializer@@3P6AHXZEA 00000001400b0458     LIBCMTD:exe_winmain.obj
- 0002:000004c0       $SG88083                   00000001400b04c0     win32_handmade.obj
- 0002:000004d0       $SG88086                   00000001400b04d0     win32_handmade.obj
- 0002:000004e8       $SG88095                   00000001400b04e8     win32_handmade.obj
- 0002:00000508       $SG88097                   00000001400b0508     win32_handmade.obj
- 0002:00000530       $SG88113                   00000001400b0530     win32_handmade.obj
- 0002:00000548       $SG88114                   00000001400b0548     win32_handmade.obj
- 0002:00000560       $SG88126                   00000001400b0560     win32_handmade.obj
- 0002:00000570       $SG88128                   00000001400b0570     win32_handmade.obj
- 0002:00000580       $SG88130                   00000001400b0580     win32_handmade.obj
- 0002:00000590       $SG88133                   00000001400b0590     win32_handmade.obj
- 0002:000005a0       $SG88134                   00000001400b05a0     win32_handmade.obj
- 0002:000005b0       $SG88189                   00000001400b05b0     win32_handmade.obj
- 0002:000005c0       $SG88191                   00000001400b05c0     win32_handmade.obj
- 0002:000005d0       $SG88193                   00000001400b05d0     win32_handmade.obj
- 0002:000005e0       $SG88195                   00000001400b05e0     win32_handmade.obj
- 0002:000005f0       $SG88294                   00000001400b05f0     win32_handmade.obj
- 0002:000005f8       $SG88295                   00000001400b05f8     win32_handmade.obj
- 0002:00000600       $SG88296                   00000001400b0600     win32_handmade.obj
- 0002:00000618       $SG88594                   00000001400b0618     win32_handmade.obj
- 0002:00000628       $SG88595                   00000001400b0628     win32_handmade.obj
- 0002:00000640       $SG88596                   00000001400b0640     win32_handmade.obj
- 0002:00000660       $SG88599                   00000001400b0660     win32_handmade.obj
- 0002:00000670       $SG88606                   00000001400b0670     win32_handmade.obj
+ 0002:000004c0       $SG88077                   00000001400b04c0     win32_handmade.obj
+ 0002:000004d0       $SG88080                   00000001400b04d0     win32_handmade.obj
+ 0002:000004e8       $SG88089                   00000001400b04e8     win32_handmade.obj
+ 0002:00000508       $SG88091                   00000001400b0508     win32_handmade.obj
+ 0002:00000530       $SG88107                   00000001400b0530     win32_handmade.obj
+ 0002:00000548       $SG88108                   00000001400b0548     win32_handmade.obj
+ 0002:00000560       $SG88120                   00000001400b0560     win32_handmade.obj
+ 0002:00000570       $SG88122                   00000001400b0570     win32_handmade.obj
+ 0002:00000580       $SG88124                   00000001400b0580     win32_handmade.obj
+ 0002:00000590       $SG88127                   00000001400b0590     win32_handmade.obj
+ 0002:000005a0       $SG88128                   00000001400b05a0     win32_handmade.obj
+ 0002:000005b0       $SG88183                   00000001400b05b0     win32_handmade.obj
+ 0002:000005c0       $SG88185                   00000001400b05c0     win32_handmade.obj
+ 0002:000005d0       $SG88187                   00000001400b05d0     win32_handmade.obj
+ 0002:000005e0       $SG88189                   00000001400b05e0     win32_handmade.obj
+ 0002:000005f0       $SG88288                   00000001400b05f0     win32_handmade.obj
+ 0002:000005f8       $SG88289                   00000001400b05f8     win32_handmade.obj
+ 0002:00000600       $SG88290                   00000001400b0600     win32_handmade.obj
+ 0002:00000618       $SG88588                   00000001400b0618     win32_handmade.obj
+ 0002:00000628       $SG88589                   00000001400b0628     win32_handmade.obj
+ 0002:00000640       $SG88590                   00000001400b0640     win32_handmade.obj
+ 0002:00000660       $SG88593                   00000001400b0660     win32_handmade.obj
+ 0002:00000670       $SG88600                   00000001400b0670     win32_handmade.obj
  0002:000006c0       GS_ExceptionPointers       00000001400b06c0     LIBCMTD:gs_report.obj
  0002:00000770       ?tokenTable@@3QBUStringLiteral@@B 00000001400b0770     libvcruntimed:undname.obj
  0002:00000880       ?nameTable@@3QBUStringLiteral@@B 00000001400b0880     libvcruntimed:undname.obj
