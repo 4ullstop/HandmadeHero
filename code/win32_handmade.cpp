@@ -440,14 +440,6 @@ LRESULT CALLBACK Win32MainWindowProc(HWND hwnd,
     case WM_ACTIVATEAPP:
     {
 	OutputDebugStringA("WM_ACTIVATEAPP\n");
-	if (wParam == TRUE)
-	{
-	    SetLayeredWindowAttributes(hwnd, RGB(0, 0, 0), 255, LWA_ALPHA);
-	}
-	else
-	{
-	    SetLayeredWindowAttributes(hwnd, RGB(0, 0, 0), 128, LWA_ALPHA);
-	}
 
     } break;
     case WM_SYSKEYDOWN:
@@ -1018,7 +1010,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
     char tempGameCodeDLLFullPath[WIN32_STATE_FILE_NAME_COUNT];
     Win32BuildEXEPathFilename(&win32State, "handmade_temp.dll", sizeof(tempGameCodeDLLFullPath), tempGameCodeDLLFullPath);
 
- 
+    
 
     //Setting the windows scheduler granularity to 1ms so that
     // our Sleep() can be more granular.
@@ -1042,7 +1034,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
     if (RegisterClass(&windowClass))
     {
 	HWND windowHandle = CreateWindowEx(
-	    WS_EX_TOPMOST|WS_EX_LAYERED, //extra window style information
+	    WS_EX_TOPMOST, //extra window style information
 	    windowClass.lpszClassName, //the class instance we created above
 	    "Handmade Hero", //name of the window
 	    WS_OVERLAPPEDWINDOW|WS_VISIBLE, //window style (bunch of parameters like borderless...etc..
@@ -1054,7 +1046,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 	    0, //no menu
 	    hInstance, //our instance
 	    0); //passing parameters in to the window which happens in WM_CREATE, can be anything we want
-	
+
 	if (windowHandle)
 	{
 	    win32_sound_output soundOutput = {};
@@ -1072,7 +1064,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		monitorRefreshHz = win32RefreshRate;
 	    }
 #endif	    
-	    real32 gameUpdateHz = (monitorRefreshHz / 2.0f);
+	    real32 gameUpdateHz = (monitorRefreshHz / 1.0f);
 	    real32 targetSecondsPerFrame = 1.0f / (real32)gameUpdateHz;
 
 	    
@@ -1186,7 +1178,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		game_input input[2] = {};
 		game_input* newInput = &input[0];
 		game_input* oldInput = &input[1];
-		newInput->secondsToAdvanceOverUpdate = targetSecondsPerFrame;
+		newInput->dTime = targetSecondsPerFrame;
 		
 		LARGE_INTEGER lastCounter = Win32GetWallClock();
 		uint64 lastCycleCount = __rdtsc();
@@ -1501,7 +1493,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 			    audioLatencySeconds =
 				(((real32)audioLatencyBytes / (real32)soundOutput.bytesPerSample)
 				 / (real32)soundOutput.samplesPerSecond);
-#if 0			
+#if 1			
 			    char textBuffer[256];
 			    sprintf_s(textBuffer, sizeof(textBuffer),
 				      "BTL: %u, TC: %u, BTW: %u - PC: %u, WC: %u, DELTA: %u, ALS: %f\n",
@@ -1606,7 +1598,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 			real64 FPS = 0;
 			real64 MCPF =  (real64)(cyclesElapsed / (1000 * 1000));
 
-#if 0
+#if 1
 			char fpsBuffer[250];
 			sprintf_s(fpsBuffer, "%.02fms/f, %ff/s, %.02fmc/f\n", msPerFrame, FPS, MCPF);
 			OutputDebugStringA(fpsBuffer);  
