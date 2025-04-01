@@ -404,10 +404,21 @@ Win32DisplayBufferWindow(win32_offscreen_buffer* buffer,
 			 int x, int y,
 			 int windowWidth, int windowHeight)
 {
-    //rectangle to rectangle copy
+    int offsetY = 10;
+    int offsetX = 10;
+    
+    PatBlt(deviceContext, 0, 0, windowWidth, offsetY + 10, BLACKNESS);
+    PatBlt(deviceContext, 0, offsetY + buffer->height, windowWidth, windowHeight, BLACKNESS);
+    PatBlt(deviceContext, 0, 0, offsetX, windowHeight, BLACKNESS);
+    PatBlt(deviceContext, offsetX + buffer->width, 0, windowWidth, windowHeight, BLACKNESS);
+    
+
+
+//rectangle to rectangle copy
+    
     StretchDIBits(deviceContext,
-		  0, 0, buffer->width, buffer->height,
-		  0, 0, buffer->width, buffer->height,
+		  offsetX, offsetY, buffer->width, buffer->height,
+		  offsetX, offsetY, buffer->width, buffer->height,
 		  buffer->memory,
 		  &buffer->info,
 		  DIB_RGB_COLORS,
@@ -1064,7 +1075,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		monitorRefreshHz = win32RefreshRate;
 	    }
 #endif	    
-	    real32 gameUpdateHz = (monitorRefreshHz / 1.0f);
+	    real32 gameUpdateHz = (monitorRefreshHz / 2.0f);
 	    real32 targetSecondsPerFrame = 1.0f / (real32)gameUpdateHz;
 
 	    
@@ -1178,7 +1189,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		game_input input[2] = {};
 		game_input* newInput = &input[0];
 		game_input* oldInput = &input[1];
-		newInput->dTime = targetSecondsPerFrame;
+	
 		
 		LARGE_INTEGER lastCounter = Win32GetWallClock();
 		uint64 lastCycleCount = __rdtsc();
@@ -1202,6 +1213,7 @@ int CALLBACK WinMain(HINSTANCE hInstance,
 		 */
 		while(running)
 		{
+		    newInput->dTime = targetSecondsPerFrame;
 		    FILETIME newDLLWriteTime = Win32GetLastWriteTime(sourceGameCodeDLLFullPath);
 		    if (CompareFileTime(&newDLLWriteTime, &game.dllLastWriteTime) != 0)
 		    {
