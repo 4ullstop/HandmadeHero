@@ -1,4 +1,5 @@
 #include "handmade.h"
+#include "handmade_intrinsics.h"
 
 internal void
 GameOutputSound(game_state* gameState, game_sound_output_buffer *soundBuffer, int toneHz)
@@ -27,35 +28,6 @@ GameOutputSound(game_state* gameState, game_sound_output_buffer *soundBuffer, in
 	}
 #endif	
     }
-}
-
-inline int32
-RoundReal32ToInt32(real32 real32)
-{
-    int32 result = (int32)(real32 + 0.5f);
-    return(result);
-}
-
-inline uint32
-RoundReal32ToUInt32(real32 real32)
-{
-    uint32 result = (uint32)(real32 + 0.5f);
-    return(result);
-}
-
-#include "math.h"
-inline int32
-FloorReal32ToInt32(real32 real32)
-{
-    int32 result = (int32)floorf(real32);
-    return(result);
-}
-
-inline int32
-TruncateReal32ToInt32(real32 real32)
-{
-    int32 result = (int32)real32;
-    return(result);
 }
 
 internal void
@@ -139,7 +111,7 @@ IsTileMapPointEmpty(world* world, tile_map* tileMap, int32 testTileX, int32 test
     return(empty);
 }
 
-inline canonical_position
+internal canonical_position
 GetCanonicalPosition(world* world, raw_position pos)
 {
     canonical_position result;
@@ -150,16 +122,16 @@ GetCanonicalPosition(world* world, raw_position pos)
     real32 x = pos.x - world->upperLeftX;
     real32 y = pos.y - world->upperLeftY;
     
-    result.tileX = FloorReal32ToInt32(x / world->tileWidth);
-    result.tileY = FloorReal32ToInt32(y / world->tileHeight);
+    result.tileX = FloorReal32ToInt32(x / world->tileSideInPixels);
+    result.tileY = FloorReal32ToInt32(y / world->tileSideInPixels);
 
-    result.x = x - result.tileX * world->tileWidth;
-    result.y = y - result.tileY * world->tileHeight;
+    result.x = x - result.tileX * world->tileSideInPixels;
+    result.y = y - result.tileY * world->tileSideInPixels;
 
     Assert(result.x >= 0);
     Assert(result.y >= 0);
-    Assert(result.x < world->tileWidth);
-    Assert(result.y < world->tileHeight);
+    Assert(result.x < world->tileSideInPixels);
+    Assert(result.y < world->tileSideInPixels);
     
 
     //If we step out of bounds, go to the next tile
@@ -271,15 +243,15 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
     world.tileMapCountY = 2;    
     world.countX = TILE_MAP_COUNT_X;
     world.countY = TILE_MAP_COUNT_Y;
-    world.upperLeftX = -30;
+
+    world.tileSideInMeters = 1.4f;
+    world.tileSideInPixels = 60;
+
     world.upperLeftY = 0;
-    world.tileWidth = 60;
-    world.tileHeight = 60;
+    world.upperLeftX = -(real32)world.tileSideInPixels / 2;
 
-
-
-    real32 playerWidth = 0.75f*(real32)world.tileWidth;
-    real32 playerHeight = (real32)world.tileHeight;
+    real32 playerWidth = 0.75f*(real32)world.tileSideInPixels;
+    real32 playerHeight = (real32)world.tileSideInPixels;
     
     tileMaps[0][0].tiles = (uint32*)tiles00;
     tileMaps[0][1].tiles = (uint32*)tiles10;
@@ -354,8 +326,8 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		canonical_position canPos = GetCanonicalPosition(&world, playerPos);
 		gameState->playerTileMapX = canPos.tileMapX;
 		gameState->playerTileMapY = canPos.tileMapY;
-	        gameState->playerX = world.upperLeftX + world.tileWidth * canPos.tileX + canPos.x;
-		gameState->playerY = world.upperLeftY + world.tileHeight * canPos.tileY +  canPos.y;
+	        gameState->playerX = world.upperLeftX + world.tileSideInPixels * canPos.tileX + canPos.x;
+		gameState->playerY = world.upperLeftY + world.tileSideInPixels * canPos.tileY +  canPos.y;
 	    }
 	}
     }
@@ -372,10 +344,10 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 		gray = 1.0f;
 	    }
 
-	    real32 minX = world.upperLeftX + ((real32)column) * world.tileWidth;
-	    real32 minY = world.upperLeftY + ((real32)row) * world.tileHeight;
-	    real32 maxX = minX + world.tileWidth;
-	    real32 maxY = minY + world.tileHeight;
+	    real32 minX = world.upperLeftX + ((real32)column) * world.tileSideInPixels;
+	    real32 minY = world.upperLeftY + ((real32)row) * world.tileSideInPixels;
+	    real32 maxX = minX + world.tileSideInPixels;
+	    real32 maxY = minY + world.tileSideInPixels;
 	    DrawRectangle(buffer, minX, minY, maxX, maxY, gray, gray, gray);
 	}
     }

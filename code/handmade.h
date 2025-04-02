@@ -192,6 +192,7 @@ typedef GAME_GET_SOUND_SAMPLES(game_get_sound_samples);
 
 struct canonical_position
 {
+    //collapse these into 1 
     int32 tileMapX;
     int32 tileMapY;
 
@@ -220,13 +221,14 @@ struct tile_map
 
 struct world
 {
+    real32 tileSideInMeters;
+    int32 tileSideInPixels;
+    
     int32 countX;
     int32 countY;
     
     real32 upperLeftX;
     real32 upperLeftY;
-    real32 tileWidth;
-    real32 tileHeight;
 
     int32 tileMapCountX;
     int32 tileMapCountY;
