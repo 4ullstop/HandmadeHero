@@ -43,6 +43,14 @@ RoundReal32ToUInt32(real32 real32)
     return(result);
 }
 
+#include "math.h"
+inline int32
+FloorReal32ToInt32(real32 real32)
+{
+    int32 result = (int32)floorf(real32);
+    return(result);
+}
+
 inline int32
 TruncateReal32ToInt32(real32 real32)
 {
@@ -105,48 +113,91 @@ GetTileMap(world* world, int32 tileMapX, int32 tileMapY)
 }
 
 inline uint32
-GetTileMapValueUnchecked(tile_map* tileMap, int32 tileX, int32 tileY)
+GetTileMapValueUnchecked(world* world, tile_map* tileMap, int32 tileX, int32 tileY)
 {
-    uint32 result = tileMap->tiles[tileY*tileMap->countX + tileX];
+    Assert(tileMap);
+    Assert((tileX >= 0) && (tileX < world->countX) &&
+	   (tileY >= 0) && (tileY < world->countY));
+    uint32 result = tileMap->tiles[tileY*world->countX + tileX];
     return(result);
 }
 
 internal bool32
-IsTileMapPointEmpty(tile_map* tileMap, real32 testX, real32 testY)
+IsTileMapPointEmpty(world* world, tile_map* tileMap, int32 testTileX, int32 testTileY)
 {
     bool32 empty = false;
     
-    int32 playerTileX = TruncateReal32ToInt32((testX - tileMap->upperLeftX) / tileMap->tileWidth);
-    int32 playerTileY = TruncateReal32ToInt32((testY - tileMap->upperLeftY) / tileMap->tileHeight);
-
-
-    if ((playerTileX >= 0) && (playerTileX < tileMap->countX) && 
-	(playerTileY >= 0) && (playerTileY < tileMap->countY))
+    if (tileMap)
     {
-	uint32 tileMapValue = GetTileMapValueUnchecked(tileMap, playerTileX, playerTileY);
-	empty = (tileMapValue == 0);
+	if ((testTileX >= 0) && (testTileX < world->countX) && 
+	    (testTileY >= 0) && (testTileY < world->countY))
+	{
+	    uint32 tileMapValue = GetTileMapValueUnchecked(world, tileMap, testTileX, testTileY);
+	    empty = (tileMapValue == 0);
+	}
     }
     return(empty);
 }
 
-internal bool32
-IsWorldPointEmpty(world* world, int32 tileMapX, int32 tileMapY, real32 testX, real32 testY)
+inline canonical_position
+GetCanonicalPosition(world* world, raw_position pos)
 {
-    tile_map* tileMap = GetTileMap(world, tileMapX, tileMapY);
-    bool32 empty = false;
-    if (tileMap)
+    canonical_position result;
+
+    result.tileMapX = pos.tileMapX;
+    result.tileMapY = pos.tileMapY;
+    
+    real32 x = pos.x - world->upperLeftX;
+    real32 y = pos.y - world->upperLeftY;
+    
+    result.tileX = FloorReal32ToInt32(x / world->tileWidth);
+    result.tileY = FloorReal32ToInt32(y / world->tileHeight);
+
+    result.x = x - result.tileX * world->tileWidth;
+    result.y = y - result.tileY * world->tileHeight;
+
+    Assert(result.x >= 0);
+    Assert(result.y >= 0);
+    Assert(result.x < world->tileWidth);
+    Assert(result.y < world->tileHeight);
+    
+
+    //If we step out of bounds, go to the next tile
+    if (result.tileX < 0)
     {
-    	int32 playerTileX = TruncateReal32ToInt32((testX - tileMap->upperLeftX) / tileMap->tileWidth);
-	int32 playerTileY = TruncateReal32ToInt32((testY - tileMap->upperLeftY) / tileMap->tileHeight);
-
-
-	if ((playerTileX >= 0) && (playerTileX < tileMap->countX) && 
-	    (playerTileY >= 0) && (playerTileY < tileMap->countY))
-	{
-	    uint32 tileMapValue = GetTileMapValueUnchecked(tileMap, playerTileX, playerTileY);
-	    empty = (tileMapValue == 0);
-	}
+	result.tileX = world->countX + result.tileX;
+	--result.tileMapX;
     }
+
+    if (result.tileY < 0)
+    {
+	result.tileY = world->countY + result.tileY;
+	--result.tileMapY;
+    }
+
+    if (result.tileX >= world->countX)
+    {
+	result.tileX = result.tileX - world->countX;
+	++result.tileMapX;
+    }
+
+    if (result.tileY >= world->countY)
+    {
+	result.tileY = result.tileY - world->countY;
+	++result.tileMapY;
+    }
+    return(result);
+}
+
+internal bool32
+IsWorldPointEmpty(world* world, raw_position testPos)
+{
+    bool32 empty = false;
+
+    canonical_position canPos = GetCanonicalPosition(world, testPos);
+    tile_map* tileMap = GetTileMap(world, canPos.tileMapX, canPos.tileMapY);
+    empty = IsTileMapPointEmpty(world, tileMap, canPos.tileX, canPos.tileY);
+    
     return(empty);    
 }
 
@@ -168,7 +219,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	{1, 1, 0, 0,  0, 1, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1},
 	{1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1},
 	{1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1},
-	{1, 1, 1, 1,  1, 1, 1, 1,  0, 1, 1, 1,  1, 1, 1, 1,  1},	    
+	{1, 1, 1, 1,  1, 1, 1, 1,  0, 1, 1, 1,  1, 1, 1, 1,  1}    
     };
     
     uint32 tiles01[TILE_MAP_COUNT_Y][TILE_MAP_COUNT_X] =
@@ -181,7 +232,7 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	{1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1},
 	{1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1},
 	{1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1},
-	{1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1,  1},	    
+	{1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1,  1}
     };
 
     uint32 tiles10[TILE_MAP_COUNT_Y][TILE_MAP_COUNT_X] =
@@ -194,54 +245,54 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 	{1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1},
 	{1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1},
 	{1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1},
-	{1, 1, 1, 1,  1, 1, 1, 1,  0, 1, 1, 1,  1, 1, 1, 1,  1},	    
+	{1, 1, 1, 1,  1, 1, 1, 1,  0, 1, 1, 1,  1, 1, 1, 1,  1}	    
     };
 
     uint32 tiles11[TILE_MAP_COUNT_Y][TILE_MAP_COUNT_X] =
     {
 	{1, 1, 1, 1,  1, 1, 1, 1,  0, 1, 1, 1,  1, 1, 1, 1,  1},
 	{1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1},
-	{1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1},
+ 	{1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1},
 	{1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1},
 	{0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1},
 	{1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1},
 	{1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1},
 	{1, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  0, 0, 0, 0,  1},
-	{1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1,  1},	    
+	{1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1,  1, 1, 1, 1,  1}	    
     };
     
     
     tile_map tileMaps[2][2];
+
     
-    tileMaps[0][0].countX = TILE_MAP_COUNT_X;
-    tileMaps[0][0].countY = TILE_MAP_COUNT_Y;
-
-    tileMaps[0][0].upperLeftX = -30;
-    tileMaps[0][0].upperLeftY = 0;
-    tileMaps[0][0].tileWidth = 60;
-    tileMaps[0][0].tileHeight = 60;
-
-    tileMaps[0][0].tiles = (uint32*)tiles00;
-
-
-    tileMaps[0][1] = tileMaps[0][0];
-    tileMaps[0][1].tiles = (uint32*)tiles01;
-
-    tileMaps[1][0] = tileMaps[0][0];
-    tileMaps[1][0].tiles = (uint32*)tiles10;
-
-    tileMaps[1][1] = tileMaps[0][0];
-    tileMaps[1][1].tiles = (uint32*)tiles11;
-    
-    tile_map* tileMap = &tileMaps[0][0];
-
-    real32 playerWidth = 0.75f*(real32)tileMap->tileWidth;
-    real32 playerHeight = (real32)tileMap->tileHeight;
-
     world world;
     world.tileMaps = (tile_map*)tileMaps;
+    world.tileMapCountX = 2;
+    world.tileMapCountY = 2;    
+    world.countX = TILE_MAP_COUNT_X;
+    world.countY = TILE_MAP_COUNT_Y;
+    world.upperLeftX = -30;
+    world.upperLeftY = 0;
+    world.tileWidth = 60;
+    world.tileHeight = 60;
+
+
+
+    real32 playerWidth = 0.75f*(real32)world.tileWidth;
+    real32 playerHeight = (real32)world.tileHeight;
+    
+    tileMaps[0][0].tiles = (uint32*)tiles00;
+    tileMaps[0][1].tiles = (uint32*)tiles10;
+    tileMaps[1][0].tiles = (uint32*)tiles01;
+    tileMaps[1][1].tiles = (uint32*)tiles11;
     
     game_state* gameState = (game_state*)memory->permanentStorage;
+
+    tile_map* tileMap = GetTileMap(&world, gameState->playerTileMapX, gameState->playerTileMapY);
+    Assert(tileMap);
+
+				   
+
 
     if (!memory->isInitialized)
     {
@@ -286,13 +337,25 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
 
 	    real32 newPlayerX = gameState->playerX + input->dTime * dPlayerX;
 	    real32 newPlayerY = gameState->playerY + input->dTime * dPlayerY;
+
+	    raw_position playerPos =
+		{gameState->playerTileMapX, gameState->playerTileMapY,
+		newPlayerX, newPlayerY};
+
+	    raw_position playerLeft = playerPos;
+	    playerLeft.x -= 0.5f * playerWidth;
+	    raw_position playerRight = playerPos;
+	    playerRight.x += 0.5f * playerWidth;
 	    
-	    if (IsTileMapPointEmpty(tileMap, newPlayerX - 0.5f*playerWidth, newPlayerY) &&
-		IsTileMapPointEmpty(tileMap, newPlayerX + 0.5f*playerWidth, newPlayerY) &&
-		IsTileMapPointEmpty(tileMap, newPlayerX, newPlayerY))
+	    if (IsWorldPointEmpty(&world, playerPos) &&
+		IsWorldPointEmpty(&world, playerLeft) &&
+		IsWorldPointEmpty(&world, playerRight))
 	    {
-		gameState->playerX = newPlayerX;
-		gameState->playerY = newPlayerY;
+		canonical_position canPos = GetCanonicalPosition(&world, playerPos);
+		gameState->playerTileMapX = canPos.tileMapX;
+		gameState->playerTileMapY = canPos.tileMapY;
+	        gameState->playerX = world.upperLeftX + world.tileWidth * canPos.tileX + canPos.x;
+		gameState->playerY = world.upperLeftY + world.tileHeight * canPos.tileY +  canPos.y;
 	    }
 	}
     }
@@ -302,17 +365,17 @@ extern "C" GAME_UPDATE_AND_RENDER(GameUpdateAndRender)
     {
 	for (int column = 0; column < 17; ++column)
 	{
-	    uint32 tileId = GetTileMapValueUnchecked(tileMap, column, row);
+	    uint32 tileId = GetTileMapValueUnchecked(&world, tileMap, column, row);
 	    real32 gray = 0.5f;
 	    if (tileId == 1)
 	    {
 		gray = 1.0f;
 	    }
 
-	    real32 minX = tileMap->upperLeftX + ((real32)column) * tileMap->tileWidth;
-	    real32 minY = tileMap->upperLeftY + ((real32)row) * tileMap->tileHeight;
-	    real32 maxX = minX + tileMap->tileWidth;
-	    real32 maxY = minY + tileMap->tileHeight;
+	    real32 minX = world.upperLeftX + ((real32)column) * world.tileWidth;
+	    real32 minY = world.upperLeftY + ((real32)row) * world.tileHeight;
+	    real32 maxX = minX + world.tileWidth;
+	    real32 maxY = minY + world.tileHeight;
 	    DrawRectangle(buffer, minX, minY, maxX, maxY, gray, gray, gray);
 	}
     }
@@ -359,3 +422,4 @@ RenderGradient(game_offscreen_buffer* buffer, int xOffset, int yOffset)
     }
 }
 */
+ 

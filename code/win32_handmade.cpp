@@ -407,7 +407,7 @@ Win32DisplayBufferWindow(win32_offscreen_buffer* buffer,
     int offsetY = 10;
     int offsetX = 10;
     
-    PatBlt(deviceContext, 0, 0, windowWidth, offsetY + 10, BLACKNESS);
+    PatBlt(deviceContext, 0, 0, windowWidth, offsetY, BLACKNESS);
     PatBlt(deviceContext, 0, offsetY + buffer->height, windowWidth, windowHeight, BLACKNESS);
     PatBlt(deviceContext, 0, 0, offsetX, windowHeight, BLACKNESS);
     PatBlt(deviceContext, offsetX + buffer->width, 0, windowWidth, windowHeight, BLACKNESS);
@@ -418,7 +418,7 @@ Win32DisplayBufferWindow(win32_offscreen_buffer* buffer,
     
     StretchDIBits(deviceContext,
 		  offsetX, offsetY, buffer->width, buffer->height,
-		  offsetX, offsetY, buffer->width, buffer->height,
+		  0, 0, buffer->width, buffer->height,
 		  buffer->memory,
 		  &buffer->info,
 		  DIB_RGB_COLORS,

@@ -69,7 +69,7 @@ struct win32_state
     
     HANDLE recordingHandle;
     int inputRecordingIndex;
-
+ 
     HANDLE playbackHandle;
     int inputPlayingIndex;
     
