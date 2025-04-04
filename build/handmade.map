@@ -1,6 +1,6 @@
  handmade
 
- Timestamp is 67edabb3 (Wed Apr  2 17:27:15 2025)
+ Timestamp is 67effec8 (Fri Apr  4 11:46:16 2025)
 
  Preferred load address is 0000000180000000
 
@@ -79,9 +79,9 @@
  0000:00000000       __x64_code_ranges_to_entry_points_count 0000000000000000     <absolute>
  0000:00000100       __guard_flags              0000000000000100     <absolute>
  0000:00000000       __ImageBase                0000000180000000     <linker-defined>
- 0001:00007850       ?GetTileMapValueUnchecked@@YAIPEAUworld@@PEAUtile_map@@HH@Z 0000000180008850 f i handmade.obj
  0001:000078e0       __GSHandlerCheck           00000001800088e0 f   LIBCMTD:gshandler.obj
  0001:00007930       __GSHandlerCheckCommon     0000000180008930 f   LIBCMTD:gshandler.obj
+ 0001:00007a30       ?RoundReal32ToInt32@@YAHM@Z 0000000180008a30 f i handmade.obj
  0001:00007a80       __security_check_cookie    0000000180008a80 f   LIBCMTD:amdsecgs.obj
  0001:00007ca0       ?RoundReal32ToUInt32@@YAIM@Z 0000000180008ca0 f i handmade.obj
  0001:00007fb0       _CRT_INIT                  0000000180008fb0 f   LIBCMTD:dll_dllmain.obj
@@ -147,7 +147,6 @@
  0001:00009a60       _guard_icall_checks_enforced 000000018000aa60 f i LIBCMTD:guard_support.obj
  0001:00009ab0       _guard_rf_checks_enforced  000000018000aab0 f i LIBCMTD:guard_support.obj
  0001:00009ac0       __isa_available_init       000000018000aac0 f   LIBCMTD:cpu_disp.obj
- 0001:00009e70       ?RoundReal32ToInt32@@YAHM@Z 000000018000ae70 f i handmade.obj
  0001:00009f50       _get_startup_argv_mode     000000018000af50 f   LIBCMTD:argv_mode.obj
  0001:00009f60       __scrt_is_ucrt_dll_in_use  000000018000af60 f   LIBCMTD:ucrt_detection.obj
  0001:00009f90       RtlCaptureContext          000000018000af90 f   kernel32:KERNEL32.dll
@@ -282,9 +281,12 @@
  0001:0000e280       ?Destructor@_HeapManager@@QEAAXXZ 000000018000f280 f i libvcruntimed:undname.obj
  0001:0000e340       ?UScore@UnDecorator@@SA?AUStringLiteral@@W4Tokens@@@Z 000000018000f340 f   libvcruntimed:undname.obj
  0001:0000e3f0       ?composeDeclaration@UnDecorator@@CA?AVDName@@AEBV2@@Z 000000018000f3f0 f i libvcruntimed:undname.obj
- 0001:00010910       ?FloorReal32ToInt32@@YAHM@Z 0000000180011910 f i handmade.obj
  0001:00010940       ?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@I@Z 0000000180011940 f i handmade.obj
+ 0001:00010990       ?FloorReal32ToInt32@@YAHM@Z 0000000180011990 f i handmade.obj
+ 0001:000109c0       ?RecanonicalizeCoord@@YAXPEAUworld@@HPEAH1PEAM@Z 00000001800119c0 f i handmade.obj
  0001:00010b70       floorf                     0000000180011b70 f   libucrtd:floorf.obj
+ 0001:00010cc0       ?GetTileMapValueUnchecked@@YAIPEAUworld@@PEAUtile_map@@HH@Z 0000000180011cc0 f i handmade.obj
+ 0001:00010d50       ?RecanonicalizePosition@@YA?AUcanonical_position@@PEAUworld@@U1@@Z 0000000180011d50 f i handmade.obj
  0001:00011270       ?doAccessSpecifiers@UnDecorator@@SAHXZ 0000000180012270 f i libvcruntimed:undname.obj
  0001:000112b0       ?doAllocationLanguage@UnDecorator@@SAHXZ 00000001800122b0 f i libvcruntimed:undname.obj
  0001:000112f0       ?doAllocationModel@UnDecorator@@SAHXZ 00000001800122f0 f i libvcruntimed:undname.obj
@@ -2731,8 +2733,8 @@
  0001:000d8a70       strrchr                    00000001800d9a70 f   libvcruntimed:strrchr.obj
  0001:000d8f90       _local_unwind              00000001800d9f90 f   libvcruntimed:jmpuwind.obj
  0001:000d8fc3       RtlUnwind                  00000001800d9fc3 f   kernel32:KERNEL32.dll
- 0001:000d9630       GameUpdateAndRender        00000001800da630 f   handmade.obj
- 0001:000db970       GameGetSoundSamples        00000001800dc970 f   handmade.obj
+ 0001:000d9370       GameUpdateAndRender        00000001800da370 f   handmade.obj
+ 0001:000db7b0       GameGetSoundSamples        00000001800dc7b0 f   handmade.obj
  0001:000dd590       _guard_dispatch_icall_nop  00000001800de590 f   LIBCMTD:guard_dispatch.obj
  0001:000dd5b0       _guard_xfg_dispatch_icall_nop 00000001800de5b0 f   LIBCMTD:guard_xfg_dispatch.obj
  0001:000de5f0       memcpy_repmovs             00000001800df5f0 f   libvcruntimed:memcpy.obj
@@ -2762,15 +2764,13 @@
  0002:00000bec       __real@3f800000            00000001800e4bec     handmade.obj
  0002:00000bf0       __real@3fb33333            00000001800e4bf0     handmade.obj
  0002:00000bf4       __real@40000000            00000001800e4bf4     handmade.obj
- 0002:00000bf8       __real@42800000            00000001800e4bf8     handmade.obj
- 0002:00000bfc       __real@43160000            00000001800e4bfc     handmade.obj
- 0002:00000c00       __real@437f0000            00000001800e4c00     handmade.obj
- 0002:00000c04       __real@bf800000            00000001800e4c04     handmade.obj
+ 0002:00000bf8       __real@40a00000            00000001800e4bf8     handmade.obj
+ 0002:00000bfc       __real@437f0000            00000001800e4bfc     handmade.obj
+ 0002:00000c00       __real@bf800000            00000001800e4c00     handmade.obj
  0002:00000c08       _pDefaultRawDllMain        00000001800e4c08     LIBCMTD:dll_dllmain.obj
  0002:00000c08       _pRawDllMain               00000001800e4c08     LIBCMTD:dll_dllmain.obj
  0002:00000c30       ??_C@_0EC@CDJPIOJK@D?3?2a?2_work?21?2s?2src?2vctools?2crt?2@ 00000001800e4c30     libvcruntimed:std_type_info.obj
  0002:00000c80       _pDestructExceptionObject  00000001800e4c80     libvcruntimed:ehhelpers.obj
- 0002:000013a0       __xmm@80000000800000008000000080000000 00000001800e53a0     handmade.obj
  0002:00001510       ??_C@_08EHJDFFNH@__based?$CI@ 00000001800e5510     libvcruntimed:undname.obj
  0002:00001520       ??_C@_07KOLFKCDI@__cdecl@  00000001800e5520     libvcruntimed:undname.obj
  0002:00001530       ??_C@_08GHMPAG@__pascal@   00000001800e5530     libvcruntimed:undname.obj
@@ -3663,6 +3663,7 @@
  0002:0001a878       ??_C@_1BG@PCPANGGF@?$AA_?$AAw?$AAc?$AAs?$AAn?$AAi?$AAc?$AAo?$AAl?$AAl@ 00000001800fe878     libucrtd:wcsnicol.obj
  0002:0001a8a0       ??_C@_1GG@LACFCIFA@?$AAm?$AAi?$AAn?$AAk?$AAe?$AAr?$AAn?$AAe?$AAl?$AA?2?$AAc?$AAr?$AAt?$AAs?$AA?2@ 00000001800fe8a0     libucrtd:strnicol.obj
  0002:0001a920       ??_C@_1BK@IOJEBPLP@?$AA_?$AAs?$AAt?$AAr?$AAn?$AAi?$AAc?$AAo?$AAl?$AAl?$AA_?$AAl@ 00000001800fe920     libucrtd:strnicol.obj
+ 0002:0001b780       __xmm@80000000800000008000000080000000 00000001800ff780     handmade.obj
  0002:0001ba5c       ??_C@_15EMKDOKLE@?$AAa?$AAr@ 00000001800ffa5c     libucrtd:lcidtoname_downlevel.obj
  0002:0001ba64       ??_C@_15KNPADPLH@?$AAb?$AAg@ 00000001800ffa64     libucrtd:lcidtoname_downlevel.obj
  0002:0001ba6c       ??_C@_15EDMHLDMO@?$AAc?$AAa@ 00000001800ffa6c     libucrtd:lcidtoname_downlevel.obj
@@ -4608,6 +4609,7 @@
  Static symbols
 
  0000:ffed7000       .debug$S                   0000000180000000     handmade.exp
+ 0000:00000000       _volmd                     0000000180000000     handmade.obj
  0000:00000000       _volmd                     0000000180000000     handmade.obj
  0000:ffed9000       __guard_xfg??$console_output_reopen_and_retry@V<lambda_61c1b8a38cedca4df5fdc542e6ccae6d>@@@@YAHAEBV<lambda_61c1b8a38cedca4df5fdc542e6ccae6d>@@@Z 0000000180000000     libucrtd:initcon.obj
  0000:ffed9000       __guard_xfg??0<lambda_61c1b8a38cedca4df5fdc542e6ccae6d>@@QEAA@AEBQEBXAEBKAEBQEAK@Z 0000000180000000     libucrtd:initcon.obj
@@ -9105,8 +9107,6 @@
  0000:00000000       _volmd                     0000000180000000     libvcruntimed:winapi_downlevel.obj
  0000:00000000       _volmd                     0000000180000000     libvcruntimed:winapi_downlevel.obj
  0000:ffedb004       __guard_fids__             0000000180000004     libucrtd:stdio_initializer.obj
- 0000:00000010       _volmd                     0000000180000010     handmade.obj
- 0000:00000020       _volmd                     0000000180000020     handmade.obj
  0001:00007a70       $$000000                   0000000180008a70     LIBCMTD:amdsecgs.obj
  0001:00007ab0       ?dllmain_crt_dispatch@@YAHQEAUHINSTANCE__@@KQEAX@Z 0000000180008ab0 f   LIBCMTD:dll_dllmain.obj
  0001:00007b60       ?dllmain_crt_process_attach@@YAHQEAUHINSTANCE__@@QEAX@Z 0000000180008b60 f   LIBCMTD:dll_dllmain.obj
@@ -10117,8 +10117,7 @@
  0001:000d8fd0       ?GameOutputSound@@YAXPEAUgame_state@@PEAUgame_sound_output_buffer@@H@Z 00000001800d9fd0 f   handmade.obj
  0001:000d9080       ?DrawRectangle@@YAXPEAUgame_offscreen_buffer@@MMMMMMM@Z 00000001800da080 f   handmade.obj
  0001:000d9260       ?IsTileMapPointEmpty@@YAHPEAUworld@@PEAUtile_map@@HH@Z 00000001800da260 f   handmade.obj
- 0001:000d9300       ?GetCanonicalPosition@@YA?AUcanonical_position@@PEAUworld@@Uraw_position@@@Z 00000001800da300 f   handmade.obj
- 0001:000d9540       ?IsWorldPointEmpty@@YAHPEAUworld@@Uraw_position@@@Z 00000001800da540 f   handmade.obj
+ 0001:000d9300       ?IsWorldPointEmpty@@YAHPEAUworld@@Ucanonical_position@@@Z 00000001800da300 f   handmade.obj
  0001:000dd580       $$000000                   00000001800de580     LIBCMTD:guard_dispatch.obj
  0001:000dd5a0       $$000000                   00000001800de5a0     LIBCMTD:guard_xfg_dispatch.obj
  0001:000de5f0       $$000000                   00000001800df5f0     libvcruntimed:memcpy.obj
@@ -10551,13 +10550,13 @@
  0002:000277e0       SetSmallYmm                000000018010b7e0     libvcruntimed:memset.obj
  0002:00027804       SetSmallYmmNT              000000018010b804     libvcruntimed:memset.obj
  0002:00027828       SetSmallXmm                000000018010b828     libvcruntimed:memset.obj
- 0002:000288c0       $unwind$?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@I@Z 000000018010c8c0     handmade.obj
+ 0002:000288c0       $unwind$?FloorReal32ToInt32@@YAHM@Z 000000018010c8c0     handmade.obj
  0002:000288c8       $unwind$?GetTileMap@@YAPEAUtile_map@@PEAUworld@@HH@Z 000000018010c8c8     handmade.obj
  0002:000288d0       $unwind$?GetTileMapValueUnchecked@@YAIPEAUworld@@PEAUtile_map@@HH@Z 000000018010c8d0     handmade.obj
+ 0002:000288d8       $unwind$?GetController@@YAPEAUgame_controller_input@@PEAUgame_input@@I@Z 000000018010c8d8     handmade.obj
+ 0002:000288e0       $unwind$?RecanonicalizeCoord@@YAXPEAUworld@@HPEAH1PEAM@Z 000000018010c8e0     handmade.obj
  0002:000288ec       $unwind$floorf             000000018010c8ec     libucrtd:floorf.obj
  0002:000288f4       $unwind$?RoundReal32ToInt32@@YAHM@Z 000000018010c8f4     handmade.obj
- 0002:000288fc       $unwind$?RoundReal32ToUInt32@@YAIM@Z 000000018010c8fc     handmade.obj
- 0002:00028904       $unwind$?FloorReal32ToInt32@@YAHM@Z 000000018010c904     handmade.obj
  0002:0002890c       $unwind$__GSHandlerCheckCommon 000000018010c90c     LIBCMTD:gshandler.obj
  0002:00028914       $unwind$__GSHandlerCheck   000000018010c914     LIBCMTD:gshandler.obj
  0002:00028920       $xdatasym                  000000018010c920     LIBCMTD:amdsecgs.obj
@@ -13449,10 +13448,11 @@
  0002:0002f9d4       $unwind$?GameOutputSound@@YAXPEAUgame_state@@PEAUgame_sound_output_buffer@@H@Z 00000001801139d4     handmade.obj
  0002:0002f9dc       $unwind$?DrawRectangle@@YAXPEAUgame_offscreen_buffer@@MMMMMMM@Z 00000001801139dc     handmade.obj
  0002:0002f9e4       $unwind$?IsTileMapPointEmpty@@YAHPEAUworld@@PEAUtile_map@@HH@Z 00000001801139e4     handmade.obj
- 0002:0002f9ec       $unwind$?GetCanonicalPosition@@YA?AUcanonical_position@@PEAUworld@@Uraw_position@@@Z 00000001801139ec     handmade.obj
- 0002:0002fa00       $unwind$?IsWorldPointEmpty@@YAHPEAUworld@@Uraw_position@@@Z 0000000180113a00     handmade.obj
- 0002:0002fa14       $unwind$GameUpdateAndRender 0000000180113a14     handmade.obj
- 0002:0002fa28       $unwind$GameGetSoundSamples 0000000180113a28     handmade.obj
+ 0002:0002f9ec       $unwind$?IsWorldPointEmpty@@YAHPEAUworld@@Ucanonical_position@@@Z 00000001801139ec     handmade.obj
+ 0002:0002f9f4       $unwind$GameUpdateAndRender 00000001801139f4     handmade.obj
+ 0002:0002fa08       $unwind$GameGetSoundSamples 0000000180113a08     handmade.obj
+ 0002:0002fa10       $unwind$?RecanonicalizePosition@@YA?AUcanonical_position@@PEAUworld@@U1@@Z 0000000180113a10     handmade.obj
+ 0002:0002fa30       $unwind$?RoundReal32ToUInt32@@YAIM@Z 0000000180113a30     handmade.obj
  0002:00030650       .edata                     0000000180114650     handmade.exp
  0002:00030678       rgpv                       0000000180114678     handmade.exp
  0002:00030680       rgszName                   0000000180114680     handmade.exp

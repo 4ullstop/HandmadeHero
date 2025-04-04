@@ -10,6 +10,7 @@ REM 32-bit build
 REM cl %commonCompilerFlags ..\code\win32_handmade.cpp /link %commonLinkerFlags
 
 REM 64 bit build
+REM /O2 /Oi /fp:fast
 cl %commonCompilerFlags% ..\code\handmade.cpp -Fmhandmade.map /LD /link /EXPORT:GameGetSoundSamples /EXPORT:GameUpdateAndRender 
 cl %commonCompilerFlags% ..\code\win32_handmade.cpp -Fmwin32_handmade.map /link %commonLinkerFlags% 
 popd
